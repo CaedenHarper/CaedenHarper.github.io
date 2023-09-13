@@ -1,11 +1,9 @@
 var countDownDate = new Date("Sep 14, 2023 22:00:00").getTime();
 // var countDownDate = new Date("Sep 12, 2023 9:0z9:00").getTime();
+const time_obj = document.getElementById("time");
+const hour_obj = document.getElementById("hours");
 
 function countdown() {
-
-    var time_obj = document.getElementById("time");
-    var hours_obj = document.getElementById("hours");
-
     // Get distance from now to date
     var now = new Date().getTime();
     var distance = countDownDate - now;
@@ -15,10 +13,12 @@ function countdown() {
     var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    var full_hours = days*24 + hours;
   
-    // Display main time
+    display_countdown(distance, days, hours, minutes, seconds)
+    display_hours(distance, days, hours);
+}
+
+function display_countdown(distance, days, hours, minutes, seconds) {
     if (distance < 0) {
         time_obj.innerHTML = "&#127881";
     } else if (minutes <= 0 && hours <= 0 && days <= 0) {
@@ -32,12 +32,14 @@ function countdown() {
         time_obj.innerHTML = days + "d " + hours + "h "
         + minutes + "m " + seconds + "s ";
     }
+}
 
-    // Display hours
+function display_hours(distance, days, hours) {
+    var full_hours = days*24 + hours;
     if (distance < 0 || full_hours <= 0) {
-        hours_obj.innerHTML = "";
+        hour_obj.innerHTML = "";
     } else {
-        hours_obj.innerHTML = "(" + full_hours + " hours" + ")";
+        hour_obj.innerHTML = "(" + full_hours + " hours" + ")";
     }
 }
 
