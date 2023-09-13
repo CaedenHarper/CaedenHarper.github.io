@@ -34,7 +34,7 @@ function countdown() {
     }
 
     // Display hours
-    if (distance < 0 || hours <= 0) {
+    if (distance < 0 || full_hours <= 0) {
         hours_obj.innerHTML = "";
     } else {
         hours_obj.innerHTML = "(" + full_hours + " hours" + ")";
