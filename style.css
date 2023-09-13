@@ -8,8 +8,8 @@ div {
     justify-content: center;
     align-items: center;
 
-    width: 800px;
-    height: 300px;
+    width: auto;
+    height: 20%;
     /* background-color: red; */
     
     position: absolute;
@@ -22,9 +22,8 @@ div {
 }
 
 .child {
-    text-align: center;
-
-    width: 800px;
+    width: auto;
+    margin: auto;
 
     font-size: 500%;
     font-weight: bold;
