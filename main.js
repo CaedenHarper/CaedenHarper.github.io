@@ -2,6 +2,7 @@ var countDownDate = new Date("Sep 14, 2023 22:00:00").getTime();
 // var countDownDate = new Date("Sep 12, 2023 9:0z9:00").getTime();
 const main_countdown = document.getElementById("time");
 const second_countdown = document.getElementById("hours");
+const celebration_emoji = String.fromCodePoint(127881);
 const all_units = ["hours", "minutes", "seconds", "fortnights", "dog_hours", "usain_bolt_100_meters"];
 var current_unit = "hours";
 
@@ -57,7 +58,7 @@ function current_unit_display() {
 
 function display_countdown() {
     if (distance < 0) {
-        main_countdown.textContent = "&#127881";
+        main_countdown.textContent = celebration_emoji;
     } else if (minutes <= 0 && hours <= 0 && days <= 0) {
         main_countdown.textContent = seconds + "s ";
     } else if (hours <= 0 && days <= 0) {
