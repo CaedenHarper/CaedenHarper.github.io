@@ -1,9 +1,9 @@
-var countDownDate = new Date("Sep 14, 2023 22:00:00").getTime();
-// var countDownDate = new Date("Sep 12, 2023 9:0z9:00").getTime();
+var countDownDate = new Date("Sep 28, 2023 22:00:00").getTime();
+// var countDownDate = new Date("Sep 12, 2023 9:09:00").getTime();
 const main_countdown = document.getElementById("time");
 const second_countdown = document.getElementById("hours");
 const celebration_emoji = String.fromCodePoint(127881);
-const all_units = ["hours", "minutes", "seconds", "fortnights", "dog_hours", "usain_bolt_100_meters"];
+const all_units = ["hours", "minutes", "seconds", "fortnights", "dog_hours", "usain_bolt_100_meters", "pizza_hut"];
 var current_unit = "hours";
 
 // init. globally
@@ -49,6 +49,9 @@ function current_unit_display() {
             break;
         case "usain_bolt_100_meters":
             display_usain_bolt_100_meters();
+            break;
+        case "pizza_hut":
+            display_pizza_hut();
             break;
         default:
             display_hours(distance, days, hours);
@@ -129,6 +132,16 @@ function display_usain_bolt_100_meters() {
         second_countdown.textContent = "";
     } else {
         second_countdown.textContent = "(" + num_usain_bolt + " Usain Bolt 100 meters" + ")";
+    }
+}
+
+function display_pizza_hut() {
+    var full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
+    var num_pizza_hut = Math.round(full_seconds/(15*60))
+    if (distance < 0 || num_pizza_hut <= 0) {
+        second_countdown.textContent = "";
+    } else {
+        second_countdown.textContent = "(" + num_pizza_hut + " Pizza Hut orders" + ")";
     }
 }
 

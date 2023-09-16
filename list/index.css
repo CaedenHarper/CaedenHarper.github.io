@@ -1,0 +1,47 @@
+body {
+    background-color: #ffc2db;
+}
+
+#main_div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+
+    width: auto;
+    height: 1%;
+    /* background-color: red; */
+    
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    
+    margin: auto;
+}
+
+.child {
+    width: auto;
+    margin: auto;
+    align-items: flex-start;
+
+    font-size: 200%;
+    font-weight: bold;
+    color: white;
+}
+
+.shadow {
+    text-shadow: 1px 1px 2px black;
+}
+
+/* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+}
