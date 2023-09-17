@@ -13,7 +13,8 @@ var hours = 0;
 var minutes = 0;
 var seconds = 0;
 
-second_countdown.addEventListener("click", randomize_unit);
+// second_countdown.addEventListener("click", randomize_unit);
+second_countdown.addEventListener("click", next_unit);
 
 function countdown() {
     // Get distance from now to date
@@ -158,6 +159,18 @@ function randomize_unit() {
     }
 
     current_unit = all_units_except_current[Math.floor(Math.random()*all_units_except_current.length)];
+    current_unit_display();
+}
+
+function next_unit() {
+    var index = all_units.indexOf(current_unit);
+    if (index == -1) {
+        current_unit = 'hours';
+        current_unit_display();
+        return;
+    }
+
+    current_unit = all_units[(index+1)%all_units.length]
     current_unit_display();
 }
 
