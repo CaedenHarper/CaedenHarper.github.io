@@ -1,16 +1,35 @@
 const unchecked_box = String.fromCodePoint(9744);
 const checked_box = String.fromCodePoint(9745);
 const main_div = document.getElementById("main_div");
-var id_list = [];
+var id_list = ["airfryer", "pebble ice machine", "cat", "motion activated sink", 
+"cute dishware", "fun lamp(s)", "piano", "black cherry merlot soap"];
+// sort id_list by length, then by dictionary
+id_list.sort(function(a, b) {
+    return a.length - b.length || // sort by length, if equal then
+           a.localeCompare(b);    // sort by dictionary order
+});
 
-function append_div(id_name) {
+var div_list = [];
+
+var max_width = 0;
+
+function append_to_div_list(id_name) {
     var div = document.createElement('div');
     div.id = id_name;
     div.className = 'noselect child shadow';
     div.textContent = unchecked_box + " " + id_name;
     div.addEventListener("click", function () {return check_by_id(id_name)});
-    id_list.push(id_name);
-    main_div.appendChild(div);
+
+    var width = div.offsetWidth;
+    console.log(width);
+    // if(width > max_width) {
+    //     max_width = width;
+    // }
+    // var width_string = "width:" + max_width + "px";
+    // div.setAttribute("style", width_string)
+
+    // main_div.appendChild(div);
+    div_list.push(div);
 }
 
 function check_by_id(id_name) {
@@ -22,11 +41,11 @@ function check_by_id(id_name) {
     }
 }
 
-append_div("airfryer");
-append_div("pebble ice machine");
-append_div("cat");
-append_div("motion activated sink");
-append_div("cute dishware");
-append_div("fun lamp(s)");
-append_div("piano");
-append_div("black cherry merlot soap");
+function append_to_main(div) {
+    var width = div.offsetWidth;
+    console.log(width);
+    main_div.appendChild(div);
+}
+
+id_list.forEach(append_to_div_list);
+div_list.forEach(append_to_main);

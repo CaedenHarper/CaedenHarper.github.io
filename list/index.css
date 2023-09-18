@@ -5,31 +5,36 @@ body {
 #main_div {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
 
-    width: 25%;
-    height: 99vh;
+    width: 100vw;
+    height: 100vh;
     
     position: absolute;
-    top:0;
+    top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     
     margin: auto;
     
-    /* background-color: red;
-    border-style: solid;
+    /* background-color: red; */
+    /* border-style: solid;
     border-width: 1px;
     border-color: black; */
 }
 
 .child {
-    width: 500px;
+    /* fallback width */
+    width: 35vw;
+    /* bestfit line magic that fits width of container to largest font size */
+    /* ŷ = 10.62187X + 22.03079 */
+    width: calc(calc(calc(2vw + 2vh) * 10.62187) + 22.0378px);
 
-    font-size: 200%;
-    font-weight: bold;
+    font-size: calc(2vw + 2vh);
+    /* font-size: 3vw; */
+    /* font-weight: bold; */
     color: white;
 
     /* border-style: solid;
