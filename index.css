@@ -8,9 +8,8 @@ body {
     justify-content: center;
     align-items: center;
 
-    width: auto;
-    height: 1%;
-    /* background-color: red; */
+    width: 100vw;
+    height: 100vh;
     
     position: absolute;
     top:0;
@@ -19,23 +18,21 @@ body {
     right: 0;
     
     margin: auto;
+
+    /* background-color: red; */
+    /* border-style: solid;
+    border-width: 1px;
+    border-color: black; */
 }
 
 .child {
-    width: auto;
-    margin: auto;
-
-    font-size: 500%;
+    font-size: calc(4vw + 3.5vh);
     font-weight: bold;
     color: white;
-}
-
-#time {
-    align-self: flex-start;
-}
-
-#hours {
-    align-self: flex-end;
+    
+    /* border-style: solid;
+    border-width: 1px;
+    border-color: black; */
 }
 
 .shadow {
