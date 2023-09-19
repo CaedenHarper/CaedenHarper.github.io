@@ -2,10 +2,27 @@ body {
     background-color: #ffc2db;
 }
 
+label {
+    /* font-size: calc(2vw + 1vh); */
+    font-size: 24px;
+    color: white;
+    padding-bottom: 5px;
+}
+
+textarea {
+    resize: none;
+    width: 20vw;
+    height: 20vh;
+}
+
+.noscroll::-webkit-scrollbar {
+    display: none;
+  }
+
 #main_div {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 
     width: 100vw;
@@ -29,7 +46,7 @@ body {
     /* fallback width */
     /* width: 35vw; */
 
-    font-size: calc(2vw + 2vh);
+    font-size: calc(1.5vw + 1.5vh);
     /* font-size: 3vw; */
     /* font-weight: bold; */
     color: white;

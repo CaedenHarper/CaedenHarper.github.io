@@ -12,7 +12,11 @@
     <body>
         <div id="main_div">
             <!-- add input textbox -->
-            <textarea id="text_input"></textarea>
+            <label class="noselect shadow" for="text_input">
+                Input your solves.
+            </label>
+            <textarea class="noscroll" id="text_input" 
+            autocomplete="off" rows="10" cols="40"></textarea>
             <!-- add total # of solves -->
             <div id="total" class="child shadow"></div>
             <!-- add DNF count -->
@@ -23,7 +27,7 @@
             <div id="best_time" class="child shadow"></div>
             <!-- add worst time -->
             <div id="worst_time" class="child shadow"></div>
-            <!-- add best, worst per avg (avg list)-->
+            <!-- add best, worst per avg (added dynamically)-->
             <!-- add total time solving -->
             <div id="total_time" class="child shadow"></div>
             <!-- add global average -->

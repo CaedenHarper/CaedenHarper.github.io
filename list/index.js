@@ -13,23 +13,13 @@ var div_list = [];
 
 var max_width = 0;
 
-function append_to_div_list(id_name) {
+function append_to_div(id_name) {
     var div = document.createElement('div');
     div.id = id_name;
     div.className = 'noselect child shadow';
     div.textContent = unchecked_box + " " + id_name;
     div.addEventListener("click", function () {return check_by_id(id_name)});
-
-    var width = div.offsetWidth;
-    console.log(width);
-    // if(width > max_width) {
-    //     max_width = width;
-    // }
-    // var width_string = "width:" + max_width + "px";
-    // div.setAttribute("style", width_string)
-
-    // main_div.appendChild(div);
-    div_list.push(div);
+    main_div.appendChild(div);
 }
 
 function check_by_id(id_name) {
@@ -41,11 +31,4 @@ function check_by_id(id_name) {
     }
 }
 
-function append_to_main(div) {
-    var width = div.offsetWidth;
-    console.log(width);
-    main_div.appendChild(div);
-}
-
-id_list.forEach(append_to_div_list);
-div_list.forEach(append_to_main);
+id_list.forEach(append_to_div);
