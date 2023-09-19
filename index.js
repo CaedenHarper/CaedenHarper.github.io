@@ -16,7 +16,7 @@ var seconds = 0;
 // second_countdown.addEventListener("click", randomize_unit);
 second_countdown.addEventListener("click", next_unit);
 
-function countdown() {
+function main() {
     // Get distance from now to date
     var now = new Date().getTime();
     distance = countDownDate - now;
@@ -174,4 +174,4 @@ function next_unit() {
     current_unit_display();
 }
 
-var interval = setInterval(countdown, 1000);
+var interval = setInterval(main, 1000);
