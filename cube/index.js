@@ -69,19 +69,31 @@ function text_parse(solves) {
         }
 
         if(time.includes("[")) {
-            // regex to remove comments
-            const regex = '\[[^>]+]';
-            time = time.replace(regex, '');
+            // remove comments
+            var open_bracket_index = time.indexOf("[");
+            var closed_bracket_index = time.lastIndexOf("]");
+            
+            if (open_bracket_index !== -1 && closed_bracket_index !== -1 && 
+                (closed_bracket_index > open_bracket_index)) {
+              var beforeBracket = time.substring(0, open_bracket_index);
+              var afterBracket = time.substring(closed_bracket_index + 1);
+              time = beforeBracket + afterBracket;
+            }
         }
 
         if(time.includes(":")) {
-            _ = time.split(":");
-            minutes = _[0];
-            seconds = _[1];
+            split_time = time.split(":");
+            minutes = split_time[0];
+            seconds = split_time[1];
             time = (parseFloat(seconds) + (parseFloat(minutes)*60));
         }
 
-        time_object = new CubeTime(parseFloat(time), plus_two, dnf);
+        time = parseFloat(time);
+        if(!Number.isFinite(time)) {
+            console.warn("Parsing Error: one solve was lost.")
+            continue;
+        }
+        time_object = new CubeTime(time, plus_two, dnf);
         times.push(time_object);
     }
     return times;
@@ -291,6 +303,11 @@ function total_time_solving_text(total_time_solving) {
     hours = Math.floor((total_time_solving % (60 * 60 * 24)) / (60 * 60));
     minutes = Math.floor((total_time_solving % (60 * 60)) / (60));
     seconds = Math.floor(total_time_solving % 60);
+    if(isNaN(days) || isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+        console.warn("Time spent solving is NaN.");
+        // TODO: should someshow stop time spent solving to show
+        return 'NaN';
+    }
 
     if (minutes <= 0 && hours <= 0 && days <= 0) {
         text = seconds + "s ";
@@ -378,6 +395,11 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
         }
 
         var num = time.getNum;
+        if(isNaN(num)) {
+            // should never be true--but if it were it would mess stuff up
+            console.error("Solve " + index + " was NaN.");
+            continue;
+        }
         total_time_solving += num;
 
         if(time.getDNF) {
