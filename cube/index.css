@@ -1,9 +1,9 @@
 body {
+    /* pink */
     background-color: #ffc2db;
 }
 
 label {
-    /* font-size: calc(2vw + 1vh); */
     font-size: 24px;
     color: white;
     padding: 5px;
@@ -36,6 +36,7 @@ textarea {
     
     margin: auto;
     
+    /* debug */
     /* background-color: red; */
     /* border-style: solid;
     border-width: 1px;
@@ -43,14 +44,13 @@ textarea {
 }
 
 .child {
-    /* fallback width */
-    /* width: 35vw; */
-
+    /* TODO: add fallback font-size */
+    /* This strange font size looks the best out of all the ones I tried;
+    Maybe I should change it sometime soon, but it works fine. */
     font-size: calc(1.5vw + 1.5vh);
-    /* font-size: 3vw; */
-    /* font-weight: bold; */
     color: white;
 
+    /* debug */
     /* border-style: solid;
     border-width: 1px;
     border-color: black; */

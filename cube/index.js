@@ -1,4 +1,14 @@
+/** 
+ * Stores a solve's time, if the solve is a plus two, and if the solve is a DNF.
+*/
 class CubeTime {
+    
+    /**
+    * @param {Number} num - Time of the solve.
+    * @param {boolean} plus_two - If the solve was a plus two.
+    * @param {boolean} dnf - If the solve was a DNF.
+    * @returns {CubeTime}
+    */
     constructor(num, plus_two, dnf) {
         this.num = num;
         this.plus_two = plus_two;
@@ -17,6 +27,9 @@ class CubeTime {
         return this.dnf;
     }
 
+    /**
+     * @returns {string}
+     */
     toString() {
         out = num.toString;
         if(this.plus_two) {
@@ -29,6 +42,11 @@ class CubeTime {
     }
 }
 
+/**
+ * Parses text containing a list of solves into an array of CubeTimes.
+ * @param {string} solves - String containing a list of solves.
+ * @returns {CubeTime[]}
+ */
 function text_parse(solves) {
     lines = solves.split("\n");
     times = []
@@ -101,52 +119,20 @@ function text_parse(solves) {
 
 // TODO: add csv parse
 
-// def csv_parse(file_dir: str) -> list[CubeTime]:
-//     """Parses cvs file's list of times into lists of CubeTime objects."""
+/**
+ * Parses a csv file containing a list of solves into an array of CubeTimes.
+ * @param {string} file - String containing file directory.
+ * @returns {CubeTime[]}
+ */
+function csv_parse(file) {
+    return;
+}
 
-//     times = []
-//     with open(file_dir, 'r') as file:
-//         # for loop to avoid loading entire file into memory
-//         for line in file:
-//             # throw away first line
-//             if line.startswith("No.;Time;"):
-//                 continue
-
-//             # number, comment, scramble, P. 1 currently unused
-//             number,time,comment,scramble,date,p1 = line.split(";")
-//             # day_ is day with extra time info
-//             year, month, day_ = date.split("-")
-//             # time_ is different from the solve time
-//             day, time_ = day_.split(" ")
-//             # these values unused, but stored anyway if ever needed
-//             hour, minute, second = time_.split(":")
-//             plus_two = False
-//             dnf = False
-            
-//             # plus two logic
-//             if "+" in time:
-//                 time = time.replace("+", "")
-//                 plus_two = True
-            
-//             # dnf logic
-//             if "DNF(" in time:
-//                 time = time.replace("DNF(", "")
-//                 time = time.replace (")", "")
-//                 dnf = True
-            
-//             # changes minutes to seconds (may be buggy, needs to be tested for more than one minute / maybe more than an hour?)
-//             if ":" in time:
-//                 minutes, seconds = time.split(":")
-//                 time = float(seconds) + float(minutes)*60
-
-//             try:
-//                 time_object = CubeTime(float(time), plus_two, dnf, datetime(int(year), int(month), int(day)))
-//             except ValueError:
-//                 continue
-//             times.append(time_object)
-
-//     return times
-
+/**
+ * Creates a new array containing all of times' num components.
+ * @param {CubeTime[]} times
+ * @returns {Number[]}
+ */
 function times_to_time_nums(times) {
     var time_nums = [];
     for(var i = 0; i < times.length; i++) {
@@ -156,10 +142,18 @@ function times_to_time_nums(times) {
     return time_nums;
 }
 
+/**
+ * Calculates average of n solves from given list with length n.
+ * @param {CubeTime[]} times 
+ * @returns {Number}
+ */
 function average_of_n(times) {
     var sum = 0;
     var num_of_times = times.length;
-    if(num_of_times == 1 || num_of_times == 2) {
+    
+    // fix calculation for small length lists.
+    if(num_of_times == 0) return null;
+    if(num_of_times <= 2) {
         temp_times = times_to_time_nums(times);
         sum = temp_times.reduce((partialSum, a) => partialSum + a, 0);
         return parseFloat(sum/num_of_times);
@@ -201,6 +195,11 @@ function average_of_n(times) {
     return average;
 }
 
+/**
+ * @param {CubeTime[]} times 
+ * @param {Number} solve_nums - Positive integer of solves to include.
+ * @returns {Number}
+ */
 function validate_solve_nums(times, solve_nums) {
     // include all solves
     if(solve_nums === undefined) solve_nums = times.length;
@@ -214,6 +213,10 @@ function validate_solve_nums(times, solve_nums) {
     return solve_nums;
 }
 
+/**
+ * @param {Number[]} average_list - Averages to calculate average of n for.
+ * @returns {Number[]}
+ */
 function validate_average_list(average_list) {
     // default value
     if(average_list === undefined) average_list = [5, 12, 100, 1000, 10000];
@@ -231,6 +234,12 @@ function validate_average_list(average_list) {
     return average_dict;
 }
 
+/**
+ * @param {Number[]} naive_sort 
+ * @param {Number} graph_min - Positive integer that is the minimum point of graph.
+ * @param {Number} graph_max - Positive integer that is the maximum point of graph.
+ * @returns {Number[]}
+ */
 function validate_graphs(naive_sort, graph_min, graph_max) {
     var first = naive_sort[0];
     var last = naive_sort[naive_sort.length - 1];
@@ -252,6 +261,12 @@ function validate_graphs(naive_sort, graph_min, graph_max) {
     return [graph_min, graph_max];
 }
 
+/**
+ * @param {Number[]} naive_sort 
+ * @param {Number} min - Positive integer that is the minimum point of time spread.
+ * @param {Number} max - Positive integer that is the maxmimum point of time spread.
+ * @returns {Number[]}
+ */
 function validate_minmax(naive_sort, min, max) {
     var first = naive_sort[0];
     var last = naive_sort[naive_sort.length - 1];
@@ -272,6 +287,10 @@ function validate_minmax(naive_sort, min, max) {
     return [min, max];
 }
 
+/**
+ * @param {Number} step - Positive integer of distance between each point in time spread.
+ * @returns {Number}
+ */
 function validate_step(step) {
     if(step === undefined) return 1;
     step = parseFloat(step);
@@ -279,6 +298,10 @@ function validate_step(step) {
     return step;
 }
 
+/**
+ * @param {Number[]} streaks - Numbers to show a best streak of. 
+ * @returns {{number: number[]}}
+ */
 function validate_streaks(streaks) {
     // default value
     if(streaks === undefined) streaks = [20.00];
@@ -296,6 +319,11 @@ function validate_streaks(streaks) {
     return streak_dict;
 }
 
+/**
+ * Creates text to display on the screen from seconds solving.
+ * @param {number} total_time_solving 
+ * @returns {string}
+ */
 function total_time_solving_text(total_time_solving) {
     var text;
     // Time calculations
@@ -305,7 +333,8 @@ function total_time_solving_text(total_time_solving) {
     seconds = Math.floor(total_time_solving % 60);
     if(isNaN(days) || isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
         console.warn("Time spent solving is NaN.");
-        // TODO: should someshow stop time spent solving to show
+        // should someshow stop time spent solving to show but I
+        // don't (think) this should ever be possibe, so its fine now
         return 'NaN';
     }
 
@@ -321,6 +350,23 @@ function total_time_solving_text(total_time_solving) {
     return text;
 }
 
+/**
+ * Print statistics onto the screen.
+ * @param {string} file_or_text - CSV file directory or text input.
+ * @param {boolean} file_flag - Flag set if input is a file.
+ * @param {boolean} histogram_flag - Flag set if histogram is to be created.
+ * @param {boolean} dot_flag - Flag set if dot graph is to be created.
+ * @param {Number[]} average_list - Averages to calculate average of n for.
+ * @param {Number} graph_min - Positive integer that is the minimum point of graph.
+ * @param {Number} graph_max - Positive integer that is the maximum point of graph.
+ * @param {Number} min - Positive integer that is the minimum point of time spread.
+ * @param {Number} max - Positive integer that is the maximum point of time spread.
+ * @param {Number} solve_nums - Positive integer of solves to include.
+ * @param {boolean} zero_flag - Flag set if time spread ranges with zero solves is to be shown.
+ * @param {Number} step - Positive integer of distance between each point in time spread.
+ * @param {Number[]} streaks - Numbers to show a best streak of.
+ * @returns {void}
+ */
 function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_list, graph_min, graph_max, min, max, solve_nums, zero_flag, step, streaks) {
     if(file_or_text === undefined || file_flag === undefined) return;
 
@@ -459,8 +505,8 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 
 
     // for(var i = 0; i < time_bins.length-1; i++) {
-    //     //TODO: min, max checking
-    //     //TODO: section checking, zero_flag checking
+    //     // min, max checking
+    //     // section checking, zero_flag checking
 
     //     // show time bins sections
     //     // print(f"{time_bins[index+1]:.2f} > Solve >= {time_bins[index]:.2f}: {section}")
