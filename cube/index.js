@@ -51,7 +51,7 @@ function text_parse(solves) {
     lines = solves.split("\n");
     times = []
     time_list_flag = false;
-    for (var i = 0; i < lines.length; i++) {
+    for (let i = 0; i < lines.length; i++) {
         line = lines[i];
         if(!time_list_flag) {
             if(line=="Time List:") {
@@ -88,13 +88,13 @@ function text_parse(solves) {
 
         if(time.includes("[")) {
             // remove comments
-            var open_bracket_index = time.indexOf("[");
-            var closed_bracket_index = time.lastIndexOf("]");
+            let open_bracket_index = time.indexOf("[");
+            let closed_bracket_index = time.lastIndexOf("]");
             
             if (open_bracket_index !== -1 && closed_bracket_index !== -1 && 
                 (closed_bracket_index > open_bracket_index)) {
-              var beforeBracket = time.substring(0, open_bracket_index);
-              var afterBracket = time.substring(closed_bracket_index + 1);
+              let beforeBracket = time.substring(0, open_bracket_index);
+              let afterBracket = time.substring(closed_bracket_index + 1);
               time = beforeBracket + afterBracket;
             }
         }
@@ -134,9 +134,9 @@ function csv_parse(file) {
  * @returns {Number[]}
  */
 function times_to_time_nums(times) {
-    var time_nums = [];
-    for(var i = 0; i < times.length; i++) {
-        var time = times[i];
+    let time_nums = [];
+    for(let i = 0; i < times.length; i++) {
+        let time = times[i];
         time_nums.push(time.getNum);
     }
     return time_nums;
@@ -148,8 +148,8 @@ function times_to_time_nums(times) {
  * @returns {Number}
  */
 function average_of_n(times) {
-    var sum = 0;
-    var num_of_times = times.length;
+    let sum = 0;
+    let num_of_times = times.length;
     
     // fix calculation for small length lists.
     if(num_of_times == 0) return null;
@@ -158,14 +158,14 @@ function average_of_n(times) {
         sum = temp_times.reduce((partialSum, a) => partialSum + a, 0);
         return parseFloat(sum/num_of_times);
     }
-    var trim_factor = 0.05;
-    var num_trim = Math.ceil(trim_factor*num_of_times);
+    let trim_factor = 0.05;
+    let num_trim = Math.ceil(trim_factor*num_of_times);
 
-    var num_dnfs = 0;
-    var DNFs = [];
-    var times_to_remove = [];
-    for(var i = 0; i < times.length; i++) {
-        var time = times[i];
+    let num_dnfs = 0;
+    let DNFs = [];
+    let times_to_remove = [];
+    for(let i = 0; i < times.length; i++) {
+        let time = times[i];
         if(time.getDNF) {
             num_dnfs++;
             DNFs.push(time.getNum);
@@ -176,9 +176,9 @@ function average_of_n(times) {
         return null;
     }
 
-    for(var i = 0; i < times_to_remove.length; i++) {
-        var time_to_remove = times_to_remove[i];
-        var index_to_remove = times.indexOf(time_to_remove);
+    for(let i = 0; i < times_to_remove.length; i++) {
+        let time_to_remove = times_to_remove[i];
+        let index_to_remove = times.indexOf(time_to_remove);
         if(index_to_remove !== -1) {
             times.splice(index_to_remove, 1);
         }
@@ -221,10 +221,10 @@ function validate_average_list(average_list) {
     // default value
     if(average_list === undefined) average_list = [5, 12, 100, 1000, 10000];
 
-    var average_dict = {};
+    let average_dict = {};
     // further validate average_list and construct average_dict
-    for(var i = 0; i < average_list.length; i++) {
-        var num = average_list[i];
+    for(let i = 0; i < average_list.length; i++) {
+        let num = average_list[i];
         // if num is an integer, add to dict
         num = parseInt(num);
         if(Number.isInteger(num)) {
@@ -241,8 +241,8 @@ function validate_average_list(average_list) {
  * @returns {Number[]}
  */
 function validate_graphs(naive_sort, graph_min, graph_max) {
-    var first = naive_sort[0];
-    var last = naive_sort[naive_sort.length - 1];
+    let first = naive_sort[0];
+    let last = naive_sort[naive_sort.length - 1];
     if(graph_min === undefined) graph_min = first;
     if(graph_max === undefined) graph_max = last;
     
@@ -268,8 +268,8 @@ function validate_graphs(naive_sort, graph_min, graph_max) {
  * @returns {Number[]}
  */
 function validate_minmax(naive_sort, min, max) {
-    var first = naive_sort[0];
-    var last = naive_sort[naive_sort.length - 1];
+    let first = naive_sort[0];
+    let last = naive_sort[naive_sort.length - 1];
     if(min === undefined) min = first;
     if(max === undefined) max = last;
 
@@ -305,11 +305,11 @@ function validate_step(step) {
 function validate_streaks(streaks) {
     // default value
     if(streaks === undefined) streaks = [20.00];
-    var streak_dict = {};
+    let streak_dict = {};
 
     // further validate streaks and construct streak_dict
-    for(var i = 0; i < streaks.length; i++) {
-        var num = streaks[i];
+    for(let i = 0; i < streaks.length; i++) {
+        let num = streaks[i];
         // if num is an float, add to dict
         num = parseFloat(num);
         if(Number.isFinite(num)) {
@@ -325,7 +325,7 @@ function validate_streaks(streaks) {
  * @returns {string}
  */
 function total_time_solving_text(total_time_solving) {
-    var text;
+    let text;
     // Time calculations
     days = Math.floor(total_time_solving / (60 * 60 * 24));
     hours = Math.floor((total_time_solving % (60 * 60 * 24)) / (60 * 60));
@@ -370,7 +370,7 @@ function total_time_solving_text(total_time_solving) {
 function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_list, graph_min, graph_max, min, max, solve_nums, zero_flag, step, streaks) {
     if(file_or_text === undefined || file_flag === undefined) return;
 
-    var times;
+    let times;
     if(file_flag) {
         times = csv_parse(file_or_text);
     } else {
@@ -392,12 +392,12 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
     solve_nums = validate_solve_nums(times, solve_nums);
     times = times.slice(solve_nums, (times.length + 1));
 
-    var average_dict = validate_average_list(average_list);
+    let average_dict = validate_average_list(average_list);
 
     naive_numtimes = times_to_time_nums(times);
     // naive sort for min/max
     // sort by value
-    var naive_sort = naive_numtimes.sort(function(a, b){return a - b});
+    let naive_sort = naive_numtimes.sort(function(a, b){return a - b});
 
     graphs = validate_graphs(naive_sort, graph_min, graph_max);
     graph_min = graphs[0];
@@ -409,19 +409,19 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 
     step = validate_step(step);
 
-    var streak_dict = validate_streaks(streaks);
+    let streak_dict = validate_streaks(streaks);
 
-    var total = 0;
-    var num_dnf = 0;
-    var num_plus_two = 0;
-    var total_time_solving = 0;
+    let total = 0;
+    let num_dnf = 0;
+    let num_plus_two = 0;
+    let total_time_solving = 0;
 
     best_time = times[0].getNum;
     worst_time = times[0].getNum;
     
-    var numtimes = [];
-    for(var index = 0; index < times.length; index++) {
-        var time = times[index];
+    let numtimes = [];
+    for(let index = 0; index < times.length; index++) {
+        let time = times[index];
         total++;
         if(time.getPlusTwo) {
             num_plus_two++;
@@ -429,18 +429,18 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 
         for(const key in average_dict) {
             if(index > (key-1)) {
-                var sub_times = [];
-                for(var n = index-(key-1); n < index+1; n++) {
+                let sub_times = [];
+                for(let n = index-(key-1); n < index+1; n++) {
                     sub_times.push(times[n]);
                 }
-                var avg = average_of_n(sub_times);
+                let avg = average_of_n(sub_times);
                 if(avg != null) {
                     average_dict[key].push(avg);
                 }
             }
         }
 
-        var num = time.getNum;
+        let num = time.getNum;
         if(isNaN(num)) {
             // should never be true--but if it were it would mess stuff up
             console.error("Solve " + index + " was NaN.");
@@ -453,9 +453,9 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 
             // streak counting
             for(const streak in streak_dict) {
-                var streak_list = streak_dict[streak];
-                var cur_streak = streak_list[0];
-                var best_streak = streak_list[1];
+                let streak_list = streak_dict[streak];
+                let cur_streak = streak_list[0];
+                let best_streak = streak_list[1];
                 if(cur_streak > best_streak) best_streak = cur_streak;
                 cur_streak = 0;
                 // update streak
@@ -474,10 +474,10 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 
         //streak counting
         for(const streak in streak_dict) {
-            var streak_list = streak_dict[streak];
-            var cur_streak = streak_list[0];
-            var best_streak = streak_list[1];
-            var streak_num = parseFloat(streak);
+            let streak_list = streak_dict[streak];
+            let cur_streak = streak_list[0];
+            let best_streak = streak_list[1];
+            let streak_num = parseFloat(streak);
 
             if(num < streak_num) cur_streak++;
             if(num >= streak_num) cur_streak = 0;
@@ -492,7 +492,7 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
     }
 
     //TODO: graphing bins
-    var time_bins;
+    let time_bins;
     
     // total should never be null
     if(total == null || total <= 0) {
@@ -504,7 +504,7 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
     total_div.textContent = "Total solves = " + total;
 
 
-    // for(var i = 0; i < time_bins.length-1; i++) {
+    // for(let i = 0; i < time_bins.length-1; i++) {
     //     // min, max checking
     //     // section checking, zero_flag checking
 
@@ -529,27 +529,27 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
         if(avg_times.length <= 0) continue;
         // sort by value
         avg_times.sort(function(a, b){return a - b});
-        var best = avg_times[0].toFixed(2);
-        var worst = avg_times[avg_times.length - 1].toFixed(2);
+        let best = avg_times[0].toFixed(2);
+        let worst = avg_times[avg_times.length - 1].toFixed(2);
         // show best, worst avg in html (I.E., Best Average of {KEY} = Best)
-        var text = "Best ao" + key + ": " + best + " Worst ao" + key + ": " + worst;
+        let text = "Best ao" + key + ": " + best + " Worst ao" + key + ": " + worst;
         append_to_div(text, "average");
     }
 
     // show streaks in html
     for(const streak in streak_dict) {
-        var streak_list = streak_dict[streak];
-        var cur_streak = streak_list[0];
-        var best_streak = streak_list[1];
+        let streak_list = streak_dict[streak];
+        let cur_streak = streak_list[0];
+        let best_streak = streak_list[1];
         if(cur_streak > best_streak) best_streak = cur_streak;
         
-        var streak_num = parseFloat(streak);
-        var text = "Best streak under " + streak_num.toFixed(2) + ": " + best_streak;
+        let streak_num = parseFloat(streak);
+        let text = "Best streak under " + streak_num.toFixed(2) + ": " + best_streak;
         append_to_div(text, "streak");
     }
 
     // show total time solving in html
-    var text = total_time_solving_text(total_time_solving);
+    let text = total_time_solving_text(total_time_solving);
     total_time_div.textContent = text + " spent solving.";
     // show global average in html
 }
@@ -560,7 +560,7 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 //     print(f"Global Average = {total_time_solving/(total-num_dnf):.2f}")
 
 function append_to_div(text, class_name) {
-    var div = document.createElement('div');
+    let div = document.createElement('div');
     div.className = "child shadow " + class_name;
     div.textContent = text;
     main_div.insertBefore(div, total_time_div);
@@ -594,18 +594,18 @@ function main() {
     total_time_div.textContent = '';
     
     // remove average divs
-    var averages = document.getElementsByClassName("average");
+    let averages = document.getElementsByClassName("average");
     while(averages.length > 0){
         averages[0].parentNode.removeChild(averages[0]);
     }
 
     // remove streak divs
-    var streaks = document.getElementsByClassName("streak");
+    let streaks = document.getElementsByClassName("streak");
     while(streaks.length > 0){
         streaks[0].parentNode.removeChild(streaks[0]);
     }
 
-    var user_input = text_input_div.value;
+    let user_input = text_input_div.value;
     print_stats(user_input, false);
 }
 

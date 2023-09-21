@@ -1,24 +1,24 @@
-var countDownDate = new Date("Sep 28, 2023 22:00:00").getTime();
-// var countDownDate = new Date("Sep 12, 2023 9:09:00").getTime();
+let countDownDate = new Date("Sep 28, 2023 22:00:00").getTime();
+// let countDownDate = new Date("Sep 12, 2023 9:09:00").getTime();
 const main_countdown = document.getElementById("time");
 const second_countdown = document.getElementById("hours");
 const celebration_emoji = String.fromCodePoint(127881);
 const all_units = ["hours", "minutes", "seconds", "fortnights", "dog_hours", "usain_bolt_100_meters", "pizza_hut"];
-var current_unit = "hours";
+let current_unit = "hours";
 
 // init. globally
-var distance = 0;
-var days = 0;
-var hours = 0;
-var minutes = 0;
-var seconds = 0;
+let distance = 0;
+let days = 0;
+let hours = 0;
+let minutes = 0;
+let seconds = 0;
 
 // second_countdown.addEventListener("click", randomize_unit);
 second_countdown.addEventListener("click", next_unit);
 
 function main() {
     // Get distance from now to date
-    var now = new Date().getTime();
+    let now = new Date().getTime();
     distance = countDownDate - now;
   
     // Time calculations for days, hours, minutes and seconds
@@ -77,7 +77,7 @@ function display_countdown() {
 }
 
 function display_hours() {
-    var full_hours = days*24 + hours;
+    let full_hours = days*24 + hours;
     if (distance < 0 || full_hours <= 0) {
         second_countdown.textContent = "";
     } else {
@@ -86,7 +86,7 @@ function display_hours() {
 }
 
 function display_minutes() {
-    var full_minutes = days*24*60 + hours*60 + minutes;
+    let full_minutes = days*24*60 + hours*60 + minutes;
     if (distance < 0 || full_minutes <= 0) {
         second_countdown.textContent = "";
     } else {
@@ -95,7 +95,7 @@ function display_minutes() {
 }
 
 function display_seconds() {
-    var full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
+    let full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
     if (distance < 0 || full_seconds <= 0) {
         second_countdown.textContent = "";
     } else {
@@ -105,9 +105,9 @@ function display_seconds() {
 
 function display_fortnights() {
     // fortnight = 2 weeks = 14 days = 1,210,000 seconds
-    var full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
-    var fortnight_constant = 1210000;
-    var num_fortnights = (full_seconds / (1.0 * fortnight_constant)).toFixed(4);
+    let full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
+    let fortnight_constant = 1210000;
+    let num_fortnights = (full_seconds / (1.0 * fortnight_constant)).toFixed(4);
     if (distance < 0 || num_fortnights <= 0) {
         second_countdown.textContent = "";
     } else {
@@ -116,9 +116,9 @@ function display_fortnights() {
 }
 
 function display_dog_hours() {
-    var full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
-    var num_dog_seconds = (full_seconds * 7)
-    var num_dog_hours = Math.round(num_dog_seconds/(60*60))
+    let full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
+    let num_dog_seconds = (full_seconds * 7)
+    let num_dog_hours = Math.round(num_dog_seconds/(60*60))
     if (distance < 0 || num_dog_hours <= 0) {
         second_countdown.textContent = "";
     } else {
@@ -127,8 +127,8 @@ function display_dog_hours() {
 }
 
 function display_usain_bolt_100_meters() {
-    var full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
-    var num_usain_bolt = Math.round(full_seconds/(9.58))
+    let full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
+    let num_usain_bolt = Math.round(full_seconds/(9.58))
     if (distance < 0 || num_usain_bolt <= 0) {
         second_countdown.textContent = "";
     } else {
@@ -137,8 +137,8 @@ function display_usain_bolt_100_meters() {
 }
 
 function display_pizza_hut() {
-    var full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
-    var num_pizza_hut = Math.round(full_seconds/(15*60))
+    let full_seconds = days*24*60*60 + hours*60*60 + minutes*60 + seconds;
+    let num_pizza_hut = Math.round(full_seconds/(15*60))
     if (distance < 0 || num_pizza_hut <= 0) {
         second_countdown.textContent = "";
     } else {
@@ -147,9 +147,9 @@ function display_pizza_hut() {
 }
 
 function randomize_unit() {
-    var all_units_except_current = [...all_units]
+    let all_units_except_current = [...all_units]
     
-    var index = all_units_except_current.indexOf(current_unit);
+    let index = all_units_except_current.indexOf(current_unit);
     if (index !== -1) {
         all_units_except_current.splice(index, 1);
     } else {
@@ -163,7 +163,7 @@ function randomize_unit() {
 }
 
 function next_unit() {
-    var index = all_units.indexOf(current_unit);
+    let index = all_units.indexOf(current_unit);
     if (index == -1) {
         current_unit = 'hours';
         current_unit_display();
@@ -174,4 +174,4 @@ function next_unit() {
     current_unit_display();
 }
 
-var interval = setInterval(main, 1000);
+let interval = setInterval(main, 1000);
