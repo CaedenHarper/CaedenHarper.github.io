@@ -8,20 +8,11 @@ div {
     /* This strange font size looks the best out of all the ones I tried;
     Maybe I should change it sometime soon, but it works fine. */
     font-size: calc(1.5vw + 1.5vh);
+    color: white;
 }
 
 #main_div {
     justify-content: flex-start;
-}
-
-label {
-    /* fallback font-size */
-    font-size: 30px;
-
-    /* This strange font size looks the best out of all the ones I tried;
-    Maybe I should change it sometime soon, but it works fine. */
-    font-size: calc(1.5vw + 1.5vh);
-    /* padding: 10px; */
 }
 
 textarea {
@@ -29,12 +20,6 @@ textarea {
     resize: none;
     width: 30vw;
     height: 25vh;
-}
-
-/* padding does not work on textarea; this fixes that */
-.buffer {
-    width: auto;
-    height: 10px;
 }
 
 .noscroll::-webkit-scrollbar {
@@ -54,8 +39,8 @@ textarea {
 }
 
 #div-container {
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
     flex: auto;
 }
 
@@ -76,7 +61,7 @@ textarea {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     height: 31vh;
 }
 

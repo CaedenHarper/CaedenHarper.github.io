@@ -304,7 +304,7 @@ function validate_step(step) {
  */
 function validate_streaks(streaks) {
     // default value
-    if(streaks === undefined) streaks = [20.00];
+    if(streaks === undefined) streaks = [15.00, 20.00, 25.00, 30.00];
     let streak_dict = {};
 
     // further validate streaks and construct streak_dict
@@ -506,7 +506,7 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
     }
 
     // show total in html
-    total_div.textContent = "Total solves = " + total;
+    total_div.textContent = "Total solves: " + total;
 
 
     // for(let i = 0; i < time_bins.length-1; i++) {
@@ -538,9 +538,9 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
         let worst = avg_times[avg_times.length - 1].toFixed(2);
         // show best, worst avg in html (I.E., Best Average of {KEY} = Best)
         let text = "Best ao" + key + ": " + best;
-        append_to_div(text, "average green");
+        average_to_div(text, "average green");
         text = "Worst ao" + key + ": " + worst;
-        append_to_div(text, "average red");
+        average_to_div(text, "average red");
     }
 
     // show streaks in html
@@ -552,12 +552,12 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
         
         let streak_num = parseFloat(streak);
         let text = "Best streak under " + streak_num.toFixed(2) + ": " + best_streak;
-        append_to_div(text, "streak green");
+        streak_to_div(text, "streak green");
     }
 
     // show total time solving in html
     let text = total_time_solving_text(total_time_solving);
-    total_time_div.textContent = text + " spent solving.";
+    total_time_div.textContent = "Total time: " + text;
     // show global average in html
 }
 
@@ -566,15 +566,23 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 //     print(f"({(total_time_solving/60):.2f} Minutes, {(total_time_solving/60/60):.2f} Hours, {(total_time_solving/60/60/24):.2f} Days)\n")
 //     print(f"Global Average = {total_time_solving/(total-num_dnf):.2f}")
 
-function append_to_div(text, class_name) {
+function average_to_div(text, class_name) {
     let div = document.createElement('div');
     div.className = "" + class_name;
     div.textContent = text;
-    avg_streak_div.appendChild(div);
+    avg_div.appendChild(div);
+}
+
+function streak_to_div(text, class_name) {
+    let div = document.createElement('div');
+    div.className = "" + class_name;
+    div.textContent = text;
+    streak_div.appendChild(div);
 }
 
 const main_div = document.getElementById("main_div");
-const avg_streak_div = document.getElementById("avg-streak");
+const avg_div = document.getElementById("avg");
+const streak_div = document.getElementById("streak");
 // input textbox
 const text_input_div = document.getElementById("text_input");
 // total # of solves

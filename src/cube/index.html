@@ -10,20 +10,37 @@
     </head>
     <body>
         <div id="main_div">
-            <div class="buffer"></div>
+            <div id="div-container" class="sideways">
+                <div class="column">
+                    <!-- total time solving -->
+                    <div id="total_time" class="child shadow"></div>
+                    <!-- total # of solves -->
+                    <div id="total" class="child shadow"></div>
+                    <!-- DNF count -->
+                    <div id="DNF" class="child shadow red"></div>
+                    <!-- +2 count -->
+                    <div id="plus_two" class="child shadow red"></div>
+                    <div id="best_time" class="child shadow green"></div>
+                    <div id="worst_time" class="child shadow green"></div>
+                    <!-- TODO: add global average -->
+                </div>
+                <div id="avg" class="column">
+                    <!-- best, worst per avg (added dynamically) here-->
+                </div>
+                <div id="streak" class="column">
+                    <!-- best, worst per avg (added dynamically) here-->
+                </div>
+                <div id="graph">
+                    test
+                </div>
+            </div>
             <div class="sideways">
                 <div class="column">
                     <textarea class="noscroll" id="text_input" 
-                    autocomplete="off" rows="10" cols="40"></textarea>
-                    <div class="buffer"></div>
-                    <label class="noselect shadow" for="text_input">
-                        Input your solves.
-                    </label>
+                    autocomplete="off" rows="10" cols="40"
+                    placeholder="paste here..."></textarea>
                 </div>
 
-                <!-- file_flag, histogram_flag, dot_flag, 
-                average_list, graph_min, graph_max, min, max, solve_nums, 
-                zero_flag, step, streaks -->
                 <div id="num-settings" class="settings column">
                     <div class="setting-div">Minimum Graph</div>
                     <div class="setting-div">Maximum Graph</div>
@@ -43,25 +60,6 @@
                 <div id="list-settings" class="settings column">
                     <div class="setting-div">Average of N</div>
                     <div class="setting-div">Streak of Solves under N</div>
-                </div>
-            </div>
-            <div id="div-container" class="sideways">
-                <div class="column">
-                    <!-- total time solving -->
-                    <div id="total_time" class="child shadow"></div>
-                    <!-- total # of solves -->
-                    <div id="total" class="child shadow"></div>
-                    <!-- DNF count -->
-                    <div id="DNF" class="child shadow red"></div>
-                    <!-- +2 count -->
-                    <div id="plus_two" class="child shadow red"></div>
-                    <div id="best_time" class="child shadow green"></div>
-                    <div id="worst_time" class="child shadow green"></div>
-                    <!-- TODO: add global average -->
-                </div>
-                <div id="avg-streak" class="column">
-                    <!-- best, worst per avg (added dynamically) here-->
-                    <!-- streaks (added dynamically) here -->
                 </div>
             </div>
         </div>
