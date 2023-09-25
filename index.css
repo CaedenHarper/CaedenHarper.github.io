@@ -1,6 +1,12 @@
 body {
     /* pink */
-    background-color: #ffc2db;
+    background-color: #0d0404;
+}
+
+div {
+    font-size: calc(4vw + 3.5vh);
+    font-weight: bold;
+    color: rgb(255, 91, 198);
 }
 
 #main_div {
@@ -31,9 +37,6 @@ body {
     /* TODO: add fallback font-size */
     /* This strange font size looks the best out of all the ones I tried;
     Maybe I should change it sometime soon, but it works fine. */
-    font-size: calc(4vw + 3.5vh);
-    font-weight: bold;
-    color: white;
     text-align: center;
     
     /* debug */
@@ -42,9 +45,33 @@ body {
     border-color: black; */
 }
 
-.shadow {
-    text-shadow: 2px 2px 2px black;
+a {
+    padding: 1.5vw;
+    text-decoration: none;
 }
+
+a:link {
+    /* blue */
+    color: rgb(1, 99, 185);
+}
+
+a:visited {
+    /* purple */
+    color: rgb(129, 24, 200);
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:active {
+    /* orange */
+    color: rgb(236, 169, 75);
+}
+
+/* .shadow {
+    text-shadow: 2px 2px 2px black;
+} */
 
 /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
 .noselect {

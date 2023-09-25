@@ -1,12 +1,13 @@
-body {
-    /* pink */
-    background-color: #ffc2db;
+/* import main style */
+@import "../index.css";
+
+#main_div {
+    justify-content: flex-start;
 }
 
 label {
-    font-size: 24px;
-    color: white;
-    padding: 5px;
+    font-size: 25px;
+    /* padding: 10px; */
 }
 
 textarea {
@@ -15,58 +16,24 @@ textarea {
     height: 25vh;
 }
 
+/* padding does not work on textarea; this fixes that */
+.buffer {
+    width: 0;
+    height: 10px;
+}
+
 .noscroll::-webkit-scrollbar {
     display: none;
   }
-
-#main_div {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-
-    width: 100vw;
-    height: 100vh;
-    
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    
-    margin: auto;
-    
-    /* debug */
-    /* background-color: red; */
-    /* border-style: solid;
-    border-width: 1px;
-    border-color: black; */
-}
 
 .child {
     /* TODO: add fallback font-size */
     /* This strange font size looks the best out of all the ones I tried;
     Maybe I should change it sometime soon, but it works fine. */
     font-size: calc(1.5vw + 1.5vh);
-    color: white;
 
     /* debug */
     /* border-style: solid;
     border-width: 1px;
     border-color: black; */
-}
-
-.shadow {
-    text-shadow: 1px 1px 2px black;
-}
-
-/* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
-.noselect {
-    -webkit-touch-callout: none; /* iOS Safari */
-      -webkit-user-select: none; /* Safari */
-       -khtml-user-select: none; /* Konqueror HTML */
-         -moz-user-select: none; /* Old versions of Firefox */
-          -ms-user-select: none; /* Internet Explorer/Edge */
-              user-select: none; /* Non-prefixed version, currently
-                                    supported by Chrome, Edge, Opera and Firefox */
 }

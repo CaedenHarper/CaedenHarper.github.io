@@ -5,19 +5,18 @@
         <title>&#128175 &#128175 &#128175 &#128175 &#128175</title>
         <link rel="stylesheet" type="text/css" href="index.css">
         
-        <!-- TODO: update -->
-        <!-- favicon -->
-        <link rel="apple-touch-icon" sizes="180x180" href="../resources/apple-touch-icon.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="../resources/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="../resources/favicon-16x16.png">
+        <!-- TODO: update favicon -->
+        <!-- <link rel="icon" type="image/png" sizes="32x32" href="favicon.png"> -->
     </head>
     <body>
         <div id="main_div">
+            <div class="buffer"></div>
+            <textarea class="noscroll" id="text_input" 
+            autocomplete="off" rows="10" cols="40"></textarea>
+            <div class="buffer"></div>
             <label class="noselect shadow" for="text_input">
                 Input your solves.
             </label>
-            <textarea class="noscroll" id="text_input" 
-            autocomplete="off" rows="10" cols="40"></textarea>
             <!-- total # of solves -->
             <div id="total" class="child shadow"></div>
             <!-- DNF count -->

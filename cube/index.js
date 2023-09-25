@@ -381,6 +381,11 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
         console.warn("No solves found.");
         return;
     }
+    // because there are valid solves, delete label (if it exists)
+    let label = document.getElementsByTagName("label")[0];
+    if(label != null || label != undefined) {
+        label.parentNode.removeChild(label);
+    }
 
     // input validation
     // one liners
