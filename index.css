@@ -55,11 +55,6 @@ a:link {
     color: rgb(1, 99, 185);
 }
 
-a:visited {
-    /* purple */
-    color: rgb(129, 24, 200);
-}
-
 a:hover {
     text-decoration: underline;
 }

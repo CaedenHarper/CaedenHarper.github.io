@@ -6,11 +6,17 @@
 }
 
 label {
-    font-size: 25px;
+    /* fallback font-size */
+    font-size: 30px;
+
+    /* This strange font size looks the best out of all the ones I tried;
+    Maybe I should change it sometime soon, but it works fine. */
+    font-size: calc(1.5vw + 1.5vh);
     /* padding: 10px; */
 }
 
 textarea {
+    /* background-color: rgba(255, 255, 255, 0.637); */
     resize: none;
     width: 30vw;
     height: 25vh;
@@ -18,7 +24,7 @@ textarea {
 
 /* padding does not work on textarea; this fixes that */
 .buffer {
-    width: 0;
+    width: 100vw;
     height: 10px;
 }
 
@@ -27,7 +33,9 @@ textarea {
   }
 
 .child {
-    /* TODO: add fallback font-size */
+    /* fallback font-size */
+    font-size: 30px;
+
     /* This strange font size looks the best out of all the ones I tried;
     Maybe I should change it sometime soon, but it works fine. */
     font-size: calc(1.5vw + 1.5vh);
