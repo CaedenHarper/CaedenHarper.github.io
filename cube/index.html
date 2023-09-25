@@ -11,25 +11,59 @@
     <body>
         <div id="main_div">
             <div class="buffer"></div>
-            <textarea class="noscroll" id="text_input" 
-            autocomplete="off" rows="10" cols="40"></textarea>
-            <div class="buffer"></div>
-            <label class="noselect shadow" for="text_input">
-                Input your solves.
-            </label>
-            <!-- total # of solves -->
-            <div id="total" class="child shadow"></div>
-            <!-- DNF count -->
-            <div id="DNF" class="child shadow"></div>
-            <!-- +2 count -->
-            <div id="plus_two" class="child shadow"></div>
-            <div id="best_time" class="child shadow"></div>
-            <div id="worst_time" class="child shadow"></div>
-            <!-- best, worst per avg (added dynamically) here-->
-            <!-- streaks (added dynamically) here -->
-            <!-- total time solving -->
-            <div id="total_time" class="child shadow"></div>
-            <!-- TODO: add global average -->
+            <div class="sideways">
+                <div class="column">
+                    <textarea class="noscroll" id="text_input" 
+                    autocomplete="off" rows="10" cols="40"></textarea>
+                    <div class="buffer"></div>
+                    <label class="noselect shadow" for="text_input">
+                        Input your solves.
+                    </label>
+                </div>
+
+                <!-- file_flag, histogram_flag, dot_flag, 
+                average_list, graph_min, graph_max, min, max, solve_nums, 
+                zero_flag, step, streaks -->
+                <div id="num-settings" class="settings column">
+                    <div class="setting-div">Minimum Graph</div>
+                    <div class="setting-div">Maximum Graph</div>
+                    <div class="setting-div">Minimum Number</div>
+                    <div class="setting-div">Maximum Number</div>
+                    <div class="setting-div">Number of Solves</div>
+                    <div class="setting-div">Step By</div>
+                </div>
+                <div id="bool-settings" class="settings column">
+                    <!-- Text/File switch -->
+                    <button id="file-button">Text</button>
+                    <button class="button-off">Histogram</button>
+                    <!-- TODO: remove time graph if file is not chosen -->
+                    <button class="button-off">Time Graph</button>
+                    <button class="button-off">Show Sections With Zeroes</button>
+                </div>
+                <div id="list-settings" class="settings column">
+                    <div class="setting-div">Average of N</div>
+                    <div class="setting-div">Streak of Solves under N</div>
+                </div>
+            </div>
+            <div id="div-container" class="sideways">
+                <div class="column">
+                    <!-- total time solving -->
+                    <div id="total_time" class="child shadow"></div>
+                    <!-- total # of solves -->
+                    <div id="total" class="child shadow"></div>
+                    <!-- DNF count -->
+                    <div id="DNF" class="child shadow red"></div>
+                    <!-- +2 count -->
+                    <div id="plus_two" class="child shadow red"></div>
+                    <div id="best_time" class="child shadow green"></div>
+                    <div id="worst_time" class="child shadow green"></div>
+                    <!-- TODO: add global average -->
+                </div>
+                <div id="avg-streak" class="column">
+                    <!-- best, worst per avg (added dynamically) here-->
+                    <!-- streaks (added dynamically) here -->
+                </div>
+            </div>
         </div>
         <script src="index.js"></script>
     </body>

@@ -537,8 +537,10 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
         let best = avg_times[0].toFixed(2);
         let worst = avg_times[avg_times.length - 1].toFixed(2);
         // show best, worst avg in html (I.E., Best Average of {KEY} = Best)
-        let text = "Best ao" + key + ": " + best + " Worst ao" + key + ": " + worst;
-        append_to_div(text, "average");
+        let text = "Best ao" + key + ": " + best;
+        append_to_div(text, "average green");
+        text = "Worst ao" + key + ": " + worst;
+        append_to_div(text, "average red");
     }
 
     // show streaks in html
@@ -550,7 +552,7 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
         
         let streak_num = parseFloat(streak);
         let text = "Best streak under " + streak_num.toFixed(2) + ": " + best_streak;
-        append_to_div(text, "streak");
+        append_to_div(text, "streak green");
     }
 
     // show total time solving in html
@@ -566,12 +568,13 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 
 function append_to_div(text, class_name) {
     let div = document.createElement('div');
-    div.className = "child shadow " + class_name;
+    div.className = "" + class_name;
     div.textContent = text;
-    main_div.insertBefore(div, total_time_div);
+    avg_streak_div.appendChild(div);
 }
 
 const main_div = document.getElementById("main_div");
+const avg_streak_div = document.getElementById("avg-streak");
 // input textbox
 const text_input_div = document.getElementById("text_input");
 // total # of solves

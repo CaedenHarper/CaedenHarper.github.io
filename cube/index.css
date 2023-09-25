@@ -1,6 +1,15 @@
 /* import main style */
 @import "../index.css";
 
+div {
+    /* fallback font-size */
+    font-size: 30px;
+
+    /* This strange font size looks the best out of all the ones I tried;
+    Maybe I should change it sometime soon, but it works fine. */
+    font-size: calc(1.5vw + 1.5vh);
+}
+
 #main_div {
     justify-content: flex-start;
 }
@@ -24,24 +33,84 @@ textarea {
 
 /* padding does not work on textarea; this fixes that */
 .buffer {
-    width: 100vw;
+    width: auto;
     height: 10px;
 }
 
 .noscroll::-webkit-scrollbar {
     display: none;
-  }
+}
 
-.child {
+.green {
+    color:rgb(18, 208, 75);
+}
+
+.red {
+    color:rgb(216, 22, 22);
+}
+
+.nobold {
+    font-weight: normal;
+}
+
+#div-container {
+    align-items: center;
+    justify-content: center;
+    flex: auto;
+}
+
+.sideways {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    /* align-items: center;  */
+    width: 99vw;
+    gap: 10px;
+    
+    /* margin: auto; */
+
+    /* background-color: aqua; */
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 31vh;
+}
+
+.settings {
+    /* align-items: flex-start; */
+    flex: auto;
+    gap: 2px;
+}
+
+.setting-div {
     /* fallback font-size */
     font-size: 30px;
 
     /* This strange font size looks the best out of all the ones I tried;
     Maybe I should change it sometime soon, but it works fine. */
-    font-size: calc(1.5vw + 1.5vh);
+    font-size: calc(1.25vw + 1.25vh);
+    /* background-color: aqua; */
+}
 
-    /* debug */
-    /* border-style: solid;
-    border-width: 1px;
-    border-color: black; */
+button {
+    width: 10vw;
+    height: 6vh;
+    color: white;
+    border-color: rgb(95, 95, 95);
+}
+
+#file-button {
+    color: black;
+}
+
+.button-off {
+    background-color: rgb(216, 22, 22);
+}
+
+.button-on {
+    background-color: rgb(18, 208, 75);
 }
