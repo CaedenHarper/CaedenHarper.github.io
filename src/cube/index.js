@@ -1,3 +1,5 @@
+import Chart from 'chart.js/auto'
+
 /** 
  * Stores a solve's time, if the solve is a plus two, and if the solve is a DNF.
 */
@@ -219,7 +221,7 @@ function validate_solve_nums(times, solve_nums) {
  */
 function validate_average_list(average_list) {
     // default value
-    if(average_list === undefined) average_list = [5, 12, 100, 1000, 10000];
+    if(average_list === undefined || (average_list.length == 1 && average_list[0] == '')) average_list = [5, 12, 100, 1000];
 
     let average_dict = {};
     // further validate average_list and construct average_dict
@@ -243,48 +245,22 @@ function validate_average_list(average_list) {
 function validate_graphs(naive_sort, graph_min, graph_max) {
     let first = naive_sort[0];
     let last = naive_sort[naive_sort.length - 1];
-    if(graph_min === undefined) graph_min = first;
-    if(graph_max === undefined) graph_max = last;
+    if(graph_min === undefined) graph_min = 5;
+    if(graph_max === undefined) graph_max = 30;
     
     graph_min = parseFloat(graph_min);
     graph_max = parseFloat(graph_max);
-    if(!Number.isFinite(parseFloat(graph_min))) graph_min = first;
-    if(!Number.isFinite(parseFloat(graph_max))) graph_max = last;
+    if(!Number.isFinite(parseFloat(graph_min))) graph_min = 5;
+    if(!Number.isFinite(parseFloat(graph_max))) graph_max = 30;
 
-    if(graph_min < 0) graph_min = first;
-    if(graph_max < 0) graph_max = last;
-    if(graph_min > graph_max) {
-        graph_min = first;
-        graph_max = last;
+    if(graph_min < 0) graph_min = 5;
+    if(graph_max <= 0) graph_max = 30;
+    if(graph_min >= graph_max) {
+        graph_min = 5;
+        graph_max = 30;
     }
 
     return [graph_min, graph_max];
-}
-
-/**
- * @param {Number[]} naive_sort 
- * @param {Number} min - Positive integer that is the minimum point of time spread.
- * @param {Number} max - Positive integer that is the maxmimum point of time spread.
- * @returns {Number[]}
- */
-function validate_minmax(naive_sort, min, max) {
-    let first = naive_sort[0];
-    let last = naive_sort[naive_sort.length - 1];
-    if(min === undefined) min = first;
-    if(max === undefined) max = last;
-
-    min = parseFloat(min);
-    max = parseFloat(max);
-    if(!Number.isFinite(min)) min = first;
-    if(!Number.isFinite(max)) max = last;
-
-    if(min < 0) min = first;
-    if(max < 0) max = last;
-    if(min > max) {
-        min = first;
-        max = last;
-    }
-    return [min, max];
 }
 
 /**
@@ -304,7 +280,8 @@ function validate_step(step) {
  */
 function validate_streaks(streaks) {
     // default value
-    if(streaks === undefined) streaks = [15.00, 20.00, 25.00, 30.00];
+    console.log(streaks);
+    if(streaks === undefined || (streaks.length == 1 && streaks[0] == '')) streaks = [15.00, 20.00, 25.00, 30.00];
     let streak_dict = {};
 
     // further validate streaks and construct streak_dict
@@ -354,20 +331,15 @@ function total_time_solving_text(total_time_solving) {
  * Print statistics onto the screen.
  * @param {string} file_or_text - CSV file directory or text input.
  * @param {boolean} file_flag - Flag set if input is a file.
- * @param {boolean} histogram_flag - Flag set if histogram is to be created.
- * @param {boolean} dot_flag - Flag set if dot graph is to be created.
  * @param {Number[]} average_list - Averages to calculate average of n for.
  * @param {Number} graph_min - Positive integer that is the minimum point of graph.
  * @param {Number} graph_max - Positive integer that is the maximum point of graph.
- * @param {Number} min - Positive integer that is the minimum point of time spread.
- * @param {Number} max - Positive integer that is the maximum point of time spread.
  * @param {Number} solve_nums - Positive integer of solves to include.
- * @param {boolean} zero_flag - Flag set if time spread ranges with zero solves is to be shown.
  * @param {Number} step - Positive integer of distance between each point in time spread.
  * @param {Number[]} streaks - Numbers to show a best streak of.
  * @returns {void}
  */
-function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_list, graph_min, graph_max, min, max, solve_nums, zero_flag, step, streaks) {
+function print_stats(file_or_text, file_flag, average_list, graph_min, graph_max, solve_nums, step, streaks) {
     if(file_or_text === undefined || file_flag === undefined) return;
 
     let times;
@@ -387,12 +359,6 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
         label.parentNode.removeChild(label);
     }
 
-    // input validation
-    // one liners
-    if(histogram_flag === undefined) histogram_flag = false;
-    if(dot_flag === undefined) dot_flag = false;
-    if(zero_flag === undefined) zero_flag = true;
-
     // solve_nums first to update times
     solve_nums = validate_solve_nums(times, solve_nums);
     times = times.slice(solve_nums, (times.length + 1));
@@ -408,10 +374,6 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
     graph_min = graphs[0];
     graph_max = graphs[1];
 
-    minmax = validate_minmax(naive_sort, min, max);
-    min = minmax[0];
-    max = minmax[1];
-
     step = validate_step(step);
 
     let streak_dict = validate_streaks(streaks);
@@ -423,7 +385,27 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 
     best_time = times[0].getNum;
     worst_time = times[0].getNum;
-    
+
+    // bins that split histogram:
+    // starts at graph_min - step and end at graph_max + step
+    // has intervals of step
+    // if time >= index and time <= index + 1 it gets put there
+    // if time is out of range it is not included
+    let time_bins = [];
+    let value = graph_min - step;
+    // first value's minimum is 0
+    if(value <= 0) value = 0;
+    let end = graph_max + step;
+    // also construct graph data at the same time to avoid two loops
+    let graph_data = [];
+    let index = 0;
+    while(value < end) {
+        time_bins.push[value.toFixed(2)];
+        value += step;
+        graph_data[index] = {time: value.toFixed(2), count: 0};
+        index++;
+    }
+
     let numtimes = [];
     for(let index = 0; index < times.length; index++) {
         let time = times[index];
@@ -470,6 +452,16 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
             continue;
         }
 
+        for(let i = 0; i < graph_data.length - 1; i++) {
+            let this_properties = graph_data[i];
+            let this_time = this_properties.time;
+            let next_properties = graph_data[i+1];
+            let next_time = next_properties.time;
+            if(num < next_time && num >= this_time) {
+                this_properties.count++;
+            }
+        }
+
         if(num < best_time) {
             best_time = num;
         }
@@ -495,9 +487,6 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
 
         numtimes.push(num);
     }
-
-    //TODO: graphing bins
-    let time_bins;
     
     // total should never be null
     if(total == null || total <= 0) {
@@ -508,16 +497,40 @@ function print_stats(file_or_text, file_flag, histogram_flag, dot_flag, average_
     // show total in html
     total_div.textContent = "Total solves: " + total;
 
+    let chart = Chart.getChart('graph');
+    let graph = document.getElementById('graph');
+    
+    if(chart != undefined) {
+        chart.destroy();
+    }
 
-    // for(let i = 0; i < time_bins.length-1; i++) {
-    //     // min, max checking
-    //     // section checking, zero_flag checking
-
-    //     // show time bins sections
-    //     // print(f"{time_bins[index+1]:.2f} > Solve >= {time_bins[index]:.2f}: {section}")
-    //     // print(f"({((section/total)):.2%} of Solves)\n")
-    //     ;
-    // }
+    // remove 0 count datasets at the front and end
+    graph_data.pop();
+    if(graph_data.length > 0) {
+        let test = new Chart(
+            graph,
+            {
+            type: 'bar',
+                options: {
+                  plugins: {
+                    legend: {
+                      display: false
+                    },
+                  }
+                },
+            data: {
+                labels: graph_data.map(row => row.time),
+                datasets: [
+                  {
+                    backgroundColor: blue,
+                    label: 'Solves',
+                    data: graph_data.map(row => row.count)
+                  }
+                ]
+              }
+            }
+        );
+    }
 
     // show DNF count in html
     dnf_div.textContent = "DNFs: " + num_dnf;
@@ -583,22 +596,27 @@ function streak_to_div(text, class_name) {
 const main_div = document.getElementById("main_div");
 const avg_div = document.getElementById("avg");
 const streak_div = document.getElementById("streak");
-// input textbox
 const text_input_div = document.getElementById("text_input");
-// total # of solves
 const total_div = document.getElementById("total");
-// DNF count
 const dnf_div = document.getElementById("DNF");
-// +2 count
 const plus_two_div = document.getElementById("plus_two");
-// best time
 const best_time_div = document.getElementById("best_time");
-// worst time
 const worst_time_div = document.getElementById("worst_time");
-// average list
-// total time solving
 const total_time_div = document.getElementById("total_time");
 // global average
+const min_input = document.getElementById("min-input");
+const max_input = document.getElementById("max-input");
+const numsolves_input = document.getElementById("numsolves-input");
+const step_input = document.getElementById("step-input");
+const average_input = document.getElementById("average-input");
+const streak_input = document.getElementById("streak-input");
+
+
+const blue = '#0163C3';
+const font = '#FFFFFF';
+Chart.defaults.borderColor = font;
+Chart.defaults.color = font;
+Chart.defaults.animation = false;   
 
 function main() {
     // clear all divs
@@ -621,8 +639,27 @@ function main() {
         streaks[0].parentNode.removeChild(streaks[0]);
     }
 
+    // destroy graph
+    let chart = Chart.getChart('graph');
+    
+    if(chart != undefined) {
+        chart.destroy();
+    }
+
     let user_input = text_input_div.value;
-    print_stats(user_input, false);
+    let graph_min = min_input.value;
+    let graph_max = max_input.value;
+    let solve_nums = numsolves_input.value;
+    let step = step_input.value;
+    let average_list = average_input.value.split(", ");
+    let streak_list = streak_input.value.split(", ");
+    print_stats(user_input, false, average_list, graph_min, graph_max, solve_nums, step, streak_list);
 }
 
 text_input_div.addEventListener('input', main);
+min_input.addEventListener('input', main);
+max_input.addEventListener('input', main);
+numsolves_input.addEventListener('input', main);
+step_input.addEventListener('input', main);
+average_input.addEventListener('input', main);
+streak_input.addEventListener('input', main);

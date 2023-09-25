@@ -30,8 +30,8 @@
                 <div id="streak" class="column">
                     <!-- best, worst per avg (added dynamically) here-->
                 </div>
-                <div id="graph">
-                    test
+                <div id="graph-box">
+                    <canvas id="graph" responsive="true"></canvas>
                 </div>
             </div>
             <div class="sideways">
@@ -42,27 +42,35 @@
                 </div>
 
                 <div id="num-settings" class="settings column">
-                    <div class="setting-div">Minimum Graph</div>
-                    <div class="setting-div">Maximum Graph</div>
-                    <div class="setting-div">Minimum Number</div>
-                    <div class="setting-div">Maximum Number</div>
-                    <div class="setting-div">Number of Solves</div>
-                    <div class="setting-div">Step By</div>
-                </div>
-                <div id="bool-settings" class="settings column">
-                    <!-- Text/File switch -->
-                    <button id="file-button">Text</button>
-                    <button class="button-off">Histogram</button>
-                    <!-- TODO: remove time graph if file is not chosen -->
-                    <button class="button-off">Time Graph</button>
-                    <button class="button-off">Show Sections With Zeroes</button>
+                    <div class="setting-div">
+                        Minimum Graph:
+                        <input type="number" id="min-input" min="0" placeholder="5"></input>
+                    </div>
+                    <div class="setting-div">
+                        Maximum Graph:
+                        <input type="number" id="max-input" min="0.001" placeholder="30"></input>
+                    </div>
+                    <div class="setting-div">
+                        Number of Solves:
+                        <input type="number" id="numsolves-input" placeholder="all"></input>
+                    </div>
+                    <div class="setting-div">
+                        Step By:
+                        <input type="number" id="step-input" min="1" placeholder="1"></input>
+                    </div>
                 </div>
                 <div id="list-settings" class="settings column">
-                    <div class="setting-div">Average of N</div>
-                    <div class="setting-div">Streak of Solves under N</div>
+                    <div class="setting-div">
+                        Average of N
+                        <input id="average-input" placeholder="5, 12, 100, 1000"></input>
+                    </div>
+                    <div class="setting-div">
+                        Streak of Solves under N
+                        <input id="streak-input" placeholder="15, 20, 25, 30"></input>
+                    </div>
                 </div>
             </div>
         </div>
-        <script src="index.js"></script>
+        <script type="module" src="index.js"></script>
     </body>
 </html>

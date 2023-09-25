@@ -7,7 +7,7 @@ div {
 
     /* This strange font size looks the best out of all the ones I tried;
     Maybe I should change it sometime soon, but it works fine. */
-    font-size: calc(1.5vw + 1.5vh);
+    font-size: calc(1.25vw + 1.25vh);
     color: white;
 }
 
@@ -26,6 +26,26 @@ textarea {
     display: none;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    appearance:textfield;
+    -moz-appearance:textfield; /* Firefox */
+}
+
+input {
+    width: 4vw;
+}
+
+#average-input, #streak-input {
+    width: 15vw;
+}
+
 .green {
     color:rgb(18, 208, 75);
 }
@@ -39,9 +59,16 @@ textarea {
 }
 
 #div-container {
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: flex-start;    
     justify-content: flex-start;
+    /* background-color: aqua; */
     flex: auto;
+}
+
+#graph-box {
+    flex: 1;
+    max-width: 35vw;
 }
 
 .sideways {
@@ -77,25 +104,6 @@ textarea {
 
     /* This strange font size looks the best out of all the ones I tried;
     Maybe I should change it sometime soon, but it works fine. */
-    font-size: calc(1.25vw + 1.25vh);
+    font-size: calc(1.15vw + 1.15vh);
     /* background-color: aqua; */
-}
-
-button {
-    width: 10vw;
-    height: 6vh;
-    color: white;
-    border-color: rgb(95, 95, 95);
-}
-
-#file-button {
-    color: black;
-}
-
-.button-off {
-    background-color: rgb(216, 22, 22);
-}
-
-.button-on {
-    background-color: rgb(18, 208, 75);
 }
