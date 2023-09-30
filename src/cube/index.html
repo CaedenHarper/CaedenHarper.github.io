@@ -13,15 +13,15 @@
             <div id="div-container" class="sideways">
                 <div class="column">
                     <!-- total time solving -->
-                    <div id="total_time" class="child shadow"></div>
+                    <div id="total_time" class="child"></div>
                     <!-- total # of solves -->
-                    <div id="total" class="child shadow"></div>
+                    <div id="total" class="child"></div>
                     <!-- DNF count -->
-                    <div id="DNF" class="child shadow red"></div>
+                    <div id="DNF" class="child"></div>
                     <!-- +2 count -->
-                    <div id="plus_two" class="child shadow red"></div>
-                    <div id="best_time" class="child shadow green"></div>
-                    <div id="worst_time" class="child shadow green"></div>
+                    <div id="plus_two" class="child"></div>
+                    <div id="best_time" class="child"></div>
+                    <div id="worst_time" class="child"></div>
                     <!-- TODO: add global average -->
                 </div>
                 <div id="avg" class="column">
@@ -35,6 +35,10 @@
                 </div>
             </div>
             <div class="sideways">
+                <!-- <div>
+                    <label for="file-input">Input a csv file:</label>
+                    <input type="file" id="file-input" name="file-input" accept=".csv"></input>
+                </div> -->
                 <div class="column">
                     <textarea class="noscroll" id="text_input" 
                     autocomplete="off" rows="10" cols="40"
@@ -43,30 +47,30 @@
 
                 <div id="num-settings" class="settings column">
                     <div class="setting-div">
-                        Minimum Graph:
+                        Minimum Graph: 
                         <input type="number" id="min-input" min="0" placeholder="5"></input>
                     </div>
                     <div class="setting-div">
-                        Maximum Graph:
+                        Maximum Graph: 
                         <input type="number" id="max-input" min="0.001" placeholder="30"></input>
                     </div>
                     <div class="setting-div">
-                        Number of Solves:
+                        Number of Solves: 
                         <input type="number" id="numsolves-input" placeholder="all"></input>
                     </div>
                     <div class="setting-div">
-                        Step By:
+                        Step By: 
                         <input type="number" id="step-input" min="1" placeholder="1"></input>
                     </div>
                 </div>
                 <div id="list-settings" class="settings column">
                     <div class="setting-div">
-                        Average of N
-                        <input id="average-input" placeholder="5, 12, 100, 1000"></input>
+                        Average of N: 
+                        <input id="average-input" placeholder="5, 12, 100, 1000..."></input>
                     </div>
                     <div class="setting-div">
-                        Streak of Solves under N
-                        <input id="streak-input" placeholder="15, 20, 25, 30"></input>
+                        Streak of Solves under N: 
+                        <input id="streak-input" placeholder="15, 20, 25, 30..."></input>
                     </div>
                 </div>
             </div>

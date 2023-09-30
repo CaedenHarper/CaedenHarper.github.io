@@ -33,6 +33,15 @@ div {
     border-color: black; */
 }
 
+/* dont show element that is to be deleted */
+.delete {
+    color: rgba(0, 0, 0, 0);
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    top: 0;
+}
+
 .child {
     /* TODO: add fallback font-size */
     /* This strange font size looks the best out of all the ones I tried;
@@ -63,10 +72,6 @@ a:active {
     /* orange */
     color: rgb(236, 169, 75);
 }
-
-/* .shadow {
-    text-shadow: 2px 2px 2px black;
-} */
 
 /* https://stackoverflow.com/questions/826782/how-to-disable-text-selection-highlighting */
 .noselect {
