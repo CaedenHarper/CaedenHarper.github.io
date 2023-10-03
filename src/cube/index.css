@@ -43,8 +43,8 @@ input {
 }
 
 #file-input {
-    width: 7vw;
-    color: transparent;
+    width: auto;
+    /* color: transparent; */
 }
 
 #average-input, #streak-input {

@@ -1,15 +1,11 @@
 import Chart from 'chart.js/auto';
 // TODO:
-// add file input
-// add file parser
-//
-// (maybe) add "best streak of length N" feature
-//
 // add line graph
 
 const avg_div = document.getElementById('avg');
 const streak_div = document.getElementById('streak');
-const text_input_div = document.getElementById('text_input');
+const file_input_div = document.getElementById('file-input');
+const text_input_div = document.getElementById('text-input');
 const total_div = document.getElementById('total');
 const dnf_div = document.getElementById('DNF');
 const plus_two_div = document.getElementById('plus_two');
@@ -29,6 +25,8 @@ const font = '#FFFFFF';
 Chart.defaults.borderColor = font;
 Chart.defaults.color = font;
 Chart.defaults.animation = false;
+
+let time_input;
 
 /**
  * Stores a solve's time, if the solve is a plus two, and if the solve is a DNF.
@@ -145,11 +143,61 @@ function text_parse(solves) {
 
 /**
  * Parses a csv file containing a list of solves into an array of CubeTimes.
- * @param {string} file - String containing file directory.
+ * @param {string} file_content - String resulting from file
  * @returns {CubeTime[]}
  */
-function csv_parse(file) {
-    return file;
+function csv_parse(file_content) {
+    const times = [];
+
+    const lines = file_content.split('\n');
+    for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i];
+        // throw away first line
+        if (line.startsWith('No.;Time;')) continue;
+        const info = line.split(';');
+        // const number = info[0];
+        let time = info[1];
+        // const comment = info[2];
+        // const scramble = info[3];
+        // const date = info[4];
+        // const p1 = info[5];
+        //         # day_ is day with extra time info
+        //         year, month, day_ = date.split("-")
+        //         # time_ is different from the solve time
+        //         day, time_ = day_.split(" ")
+        //         # these values unused, but stored anyway if ever needed
+        //         hour, minute, second = time_.split(":")
+
+        let plus_two = false;
+        let dnf = false;
+
+        if (time.includes('+')) {
+            time = time.replace('+', '');
+            plus_two = true;
+        }
+
+        if (time.includes('DNF(')) {
+            time = time.replace('DNF(', '');
+            time = time.replace(')', '');
+            dnf = true;
+        }
+
+        if (time.includes(':')) {
+            const split_time = time.split(':');
+            const minutes = split_time[0];
+            const seconds = split_time[1];
+            time = (parseFloat(seconds) + (parseFloat(minutes) * 60));
+        }
+
+        time = parseFloat(time);
+        if (!Number.isFinite(time)) {
+            console.warn('Parsing Error: one solve was lost.');
+            continue;
+        }
+        const time_object = new CubeTime(time, plus_two, dnf);
+        times.push(time_object);
+    }
+    return times;
 }
 
 /**
@@ -364,7 +412,6 @@ function add_to_parent(parent, text, class_name) {
 /**
  * Print statistics onto the screen.
  * @param {string} file_or_text - CSV file directory or text input.
- * @param {boolean} file_flag - Flag set if input is a file.
  * @param {Number[]} average_list - Averages to calculate average of n for.
  * @param {Number} graph_min - Positive integer that is the minimum point of graph.
  * @param {Number} graph_max - Positive integer that is the maximum point of graph.
@@ -374,8 +421,7 @@ function add_to_parent(parent, text, class_name) {
  * @returns {void}
  */
 function print_stats(
-    file_or_text,
-    file_flag,
+    times,
     average_list,
     graph_min,
     graph_max,
@@ -383,15 +429,6 @@ function print_stats(
     step,
     streaks,
     ) {
-    if (file_or_text === undefined || file_flag === undefined) return;
-
-    let times;
-    if (file_flag) {
-        times = csv_parse(file_or_text);
-    } else {
-        times = text_parse(file_or_text);
-    }
-
     if (times.length <= 0) {
         console.warn('No solves found.');
         return;
@@ -623,8 +660,7 @@ function print_stats(
     // show global average in html
 }
 
-function main() {
-    // TODO: refactor; put all in seperate functions
+function clean_divs() {
     // clear text divs
     total_time_div.textContent = '';
     total_div.textContent = '';
@@ -641,8 +677,11 @@ function main() {
     if (chart !== undefined) {
         chart.destroy();
     }
+}
 
-    const user_input = text_input_div.value;
+function main() {
+    clean_divs();
+
     const graph_min = min_input.value;
     const graph_max = max_input.value;
     const solve_nums = numsolves_input.value;
@@ -650,8 +689,7 @@ function main() {
     const average_list = average_input.value.split(', ');
     const streak_list = streak_input.value.split(', ');
     print_stats(
-        user_input,
-        false,
+        time_input,
         average_list,
         graph_min,
         graph_max,
@@ -661,7 +699,27 @@ function main() {
         );
 }
 
-text_input_div.addEventListener('input', main);
+// call main with specific input method
+file_input_div.addEventListener('change', () => {
+    const reader = new FileReader();
+    const file = file_input_div.files[0];
+
+    // TODO: use arraybuffer?
+    reader.readAsText(file);
+    reader.onload = () => {
+        text_input_div.value = '';
+        time_input = csv_parse(reader.result);
+        main();
+    };
+});
+
+text_input_div.addEventListener('input', () => {
+    file_input_div.value = '';
+    time_input = text_parse(text_input_div.value);
+    main();
+});
+
+// otherwise just call main
 min_input.addEventListener('input', main);
 max_input.addEventListener('input', main);
 numsolves_input.addEventListener('input', main);
