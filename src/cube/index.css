@@ -59,8 +59,16 @@ input {
     color:rgb(216, 22, 22);
 }
 
-.nobold {
-    font-weight: normal;
+.tooltip {
+    position: absolute;
+    background-color: rgb(37, 37, 37);
+    max-width: 30vw;
+    max-height: 25vh;
+    overflow-y: auto;
+}
+
+.tooltip::-webkit-scrollbar {
+    display: none;
 }
 
 #graph-box {

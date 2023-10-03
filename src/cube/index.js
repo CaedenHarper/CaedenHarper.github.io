@@ -22,6 +22,9 @@ const streak_input = document.getElementById('streak-input');
 
 const blue = '#0163C3';
 const font = '#FFFFFF';
+const hover = '#89CFF0';
+// non compressable space
+const space = String.fromCharCode(160);
 Chart.defaults.borderColor = font;
 Chart.defaults.color = font;
 Chart.defaults.animation = false;
@@ -60,12 +63,61 @@ class CubeTime {
      * @returns {string}
      */
     toString() {
-        let out = this.num.toString();
+        let out = this.num.toFixed(2).toString();
         if (this.plus_two) {
             out += ' (+2)';
         }
         if (this.dnf) {
             out = `(DNF) ${out}`;
+        }
+        return out;
+    }
+}
+
+/**
+ * Stores an average of N.
+*/
+class Average {
+    /**
+    * @param {Number} amount - Amount of solves.
+    * @param {Number} time - The average's time.
+    * @param {boolean} dnf - If the average was a DNF.
+    * @param {CubeTime[]} solves - List of solves in the average.
+    * @returns {Average}
+    */
+    constructor(amount, time, dnf, solves) {
+        this.amount = amount;
+        this.time = time;
+        this.dnf = dnf;
+        this.solves = solves;
+    }
+
+    get getAmount() {
+        return this.amount;
+    }
+
+    get getTime() {
+        return this.time;
+    }
+
+    get getDNF() {
+        return this.dnf;
+    }
+
+    get getSolves() {
+        return this.solves;
+    }
+
+    /**
+     * Returns list of solves as a string.
+     * @returns {string}
+     */
+    toString() {
+        let out = '';
+        for (let i = 0; i < this.solves.length; i += 1) {
+            const solve = this.solves[i];
+            out += solve.toString();
+            if (i < this.solves.length - 1) out += ', ';
         }
         return out;
     }
@@ -143,7 +195,7 @@ function text_parse(solves) {
 
 /**
  * Parses a csv file containing a list of solves into an array of CubeTimes.
- * @param {string} file_content - String resulting from file
+ * @param {string} file_content - String resulting from file to parse
  * @returns {CubeTime[]}
  */
 function csv_parse(file_content) {
@@ -218,14 +270,17 @@ function times_to_time_nums(times) {
 /**
  * Calculates average of n solves from given list with length n.
  * @param {CubeTime[]} times
- * @returns {Number}
+ * @returns {Average}
  */
 function average_of_n(times) {
+    // copy for average solves parameter
+    const times_copy = [...times];
     let sum = 0;
     const num_of_times = times.length;
+    const dnf_average = new Average(num_of_times, 0, true, times_copy);
 
     // fix calculation for small length lists.
-    if (num_of_times <= 2) return null;
+    if (num_of_times <= 2) return dnf_average;
 
     const trim_factor = 0.05;
     const num_trim = Math.ceil(trim_factor * num_of_times);
@@ -242,7 +297,7 @@ function average_of_n(times) {
         }
     }
     if (num_dnfs > num_trim) {
-        return null;
+        return dnf_average;
     }
 
     for (let i = 0; i < times_to_remove.length; i += 1) {
@@ -260,7 +315,9 @@ function average_of_n(times) {
     times = times.splice(num_trim);
     times = times.splice(0, (times.length - num_trim));
     sum = times.reduce((partialSum, a) => partialSum + a, 0);
-    return parseFloat(sum / (num_of_times - (2 * num_trim)));
+    const time = parseFloat(sum / (num_of_times - (2 * num_trim)));
+    const out = new Average(num_of_times, time, false, times_copy);
+    return out;
 }
 
 /**
@@ -296,6 +353,8 @@ function validate_average_list(average_list) {
         // if num is an integer, add to dict
         num = parseInt(num, 10);
         if (Number.isInteger(num)) {
+            // TODO: consider making this a class
+            // index 0 is
             average_dict[num] = [];
         }
     }
@@ -405,6 +464,19 @@ function add_to_parent(parent, text, class_name) {
     return div;
 }
 
+function on_hover(event, tooltip_div) {
+    event.target.style.color = hover;
+    tooltip_div.style.visibility = 'visible';
+    // necessary to prevent tooltip from inherenting the parent's hover color
+    // there is probably a better way to prevent this, but this works fine
+    tooltip_div.style.color = font;
+}
+
+function off_hover(event, tooltip_div) {
+    event.target.style.color = font;
+    tooltip_div.style.visibility = 'hidden';
+}
+
 /**
  * Print statistics onto the screen.
  * @param {string} file_or_text - CSV file directory or text input.
@@ -425,7 +497,7 @@ function print_stats(
     step,
     streaks,
     ) {
-    if (times.length <= 0) {
+    if (times === undefined || times.length <= 0) {
         console.warn('No solves found.');
         return;
     }
@@ -487,7 +559,7 @@ function print_stats(
                     sub_times.push(times[n]);
                 }
                 const avg = average_of_n(sub_times);
-                if (avg != null) {
+                if (!avg.getDNF) {
                     average_dict[key].push(avg);
                 }
             }
@@ -605,16 +677,38 @@ function print_stats(
     // show DNF count in html
     // dnf_div.textContent = `DNFs: ${num_dnf}`;
     add_to_parent(dnf_div, 'DNFs', 'remove-refresh one-line red');
-    add_to_parent(dnf_div, `: ${num_dnf}`, 'remove-refresh one-line');
+    add_to_parent(dnf_div, `:${space}`, 'remove-refresh one-line');
+    add_to_parent(dnf_div, `${num_dnf}`, 'remove-refresh one-line');
+    // const mouse_over_dnf = add_to_parent(dnf_div, `${num_dnf}`, 'remove-refresh one-line');
+    // mouse_over_dnf.addEventListener('mouseover', on_hover);
+    // mouse_over_dnf.addEventListener('mouseout', off_hover);
+
     // show +2 count in html
     add_to_parent(plus_two_div, '+2s', 'remove-refresh one-line red');
-    add_to_parent(plus_two_div, `: ${num_plus_two}`, 'remove-refresh one-line');
+    add_to_parent(plus_two_div, `:${space}`, 'remove-refresh one-line');
+    add_to_parent(plus_two_div, `${num_plus_two}`, 'remove-refresh one-line');
+    // const mouse_over_plus_two = add_to_parent(plus_two_div,
+    // `${num_plus_two}`, 'remove-refresh one-line');
+    // mouse_over_plus_two.addEventListener('mouseover', on_hover);
+    // mouse_over_plus_two.addEventListener('mouseout', off_hover);
+
     // show best time in html
     add_to_parent(best_time_div, 'Best', 'remove-refresh one-line green');
-    add_to_parent(best_time_div, `: ${best_time.toFixed(2)}`, 'remove-refresh one-line');
+    add_to_parent(best_time_div, `${space}time:${space}`, 'remove-refresh one-line');
+    add_to_parent(best_time_div, `${best_time.toFixed(2)}`, 'remove-refresh one-line');
+    // const mouse_over_best_time = add_to_parent(best_time_div,
+    // `${best_time.toFixed(2)}`, 'remove-refresh one-line');
+    // mouse_over_best_time.addEventListener('mouseover', on_hover);
+    // mouse_over_best_time.addEventListener('mouseout', off_hover);
+
     // show worst time in html
     add_to_parent(worst_time_div, 'Worst', 'remove-refresh one-line red');
-    add_to_parent(worst_time_div, `: ${worst_time.toFixed(2)}`, 'remove-refresh one-line');
+    add_to_parent(worst_time_div, `${space}time:${space}`, 'remove-refresh one-line');
+    add_to_parent(worst_time_div, `${worst_time.toFixed(2)}`, 'remove-refresh one-line');
+    // const mouse_over_worst_time = add_to_parent(worst_time_div,
+    // `${worst_time.toFixed(2)}`, 'remove-refresh one-line');
+    // mouse_over_worst_time.addEventListener('mouseover', on_hover);
+    // mouse_over_worst_time.addEventListener('mouseout', off_hover);
 
     const average_keys = Object.keys(average_dict);
     for (let i = 0; i < average_keys.length; i += 1) {
@@ -622,16 +716,34 @@ function print_stats(
         const avg_times = average_dict[key];
         if (avg_times.length <= 0) continue;
         // sort by value
-        avg_times.sort((a, b) => a - b);
-        const best = avg_times[0].toFixed(2);
-        const worst = avg_times[avg_times.length - 1].toFixed(2);
+        avg_times.sort((a, b) => a.getTime - b.getTime);
+
+        const best_avg = avg_times[0];
+        const best = best_avg.getTime.toFixed(2);
+        const worst_avg = avg_times[avg_times.length - 1];
+        const worst = worst_avg.getTime.toFixed(2);
         // show best, worst avg in html (I.E., Best Average of {KEY} = Best)
         const best_parent = add_to_parent(avg_div, '', 'remove-refresh');
         add_to_parent(best_parent, `Best ao${key}`, 'remove-refresh green one-line');
-        add_to_parent(best_parent, `: ${best}`, 'remove-refresh one-line');
+        add_to_parent(best_parent, `:${space}`, 'remove-refresh one-line');
+        const mouse_over_best = add_to_parent(best_parent, `${best}`, 'remove-refresh one-line');
+
+        // add list of solves on mouseover
+        const best_tooltip = add_to_parent(mouse_over_best, best_avg.toString(), 'tooltip');
+        best_tooltip.style.visibility = 'hidden';
+        mouse_over_best.addEventListener('mouseover', (event) => on_hover(event, best_tooltip));
+        mouse_over_best.addEventListener('mouseout', (event) => off_hover(event, best_tooltip));
+
         const worst_parent = add_to_parent(avg_div, '', 'remove-refresh');
         add_to_parent(worst_parent, `Worst ao${key}`, 'remove-refresh red one-line');
-        add_to_parent(worst_parent, `: ${worst}`, 'remove-refresh one-line');
+        add_to_parent(worst_parent, `:${space}`, 'remove-refresh one-line');
+        const mouse_over_worst = add_to_parent(worst_parent, `${worst}`, 'remove-refresh one-line');
+
+        // add list of solves on mouseover
+        const worst_tooltip = add_to_parent(mouse_over_worst, worst_avg.toString(), 'tooltip');
+        worst_tooltip.style.visibility = 'hidden';
+        mouse_over_worst.addEventListener('mouseover', (event) => on_hover(event, worst_tooltip));
+        mouse_over_worst.addEventListener('mouseout', (event) => off_hover(event, worst_tooltip));
     }
 
     // show streaks in html
