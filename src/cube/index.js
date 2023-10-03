@@ -225,12 +225,8 @@ function average_of_n(times) {
     const num_of_times = times.length;
 
     // fix calculation for small length lists.
-    if (num_of_times === 0) return null;
-    if (num_of_times <= 2) {
-        const temp_times = times_to_time_nums(times);
-        sum = temp_times.reduce((partialSum, a) => partialSum + a, 0);
-        return parseFloat(sum / num_of_times);
-    }
+    if (num_of_times <= 2) return null;
+
     const trim_factor = 0.05;
     const num_trim = Math.ceil(trim_factor * num_of_times);
 
