@@ -2,6 +2,8 @@ import Chart from 'chart.js/auto';
 // TODO:
 // add line graph
 
+// initialize constants
+// divs
 const avg_div = document.getElementById('avg');
 const streak_div = document.getElementById('streak');
 const file_input_div = document.getElementById('file-input');
@@ -20,16 +22,18 @@ const step_input = document.getElementById('step-input');
 const average_input = document.getElementById('average-input');
 const streak_input = document.getElementById('streak-input');
 
+// colors
 const blue = '#0163C3';
-const font = '#FFFFFF';
-const hover = '#89CFF0';
-// non compressable space
-const space = String.fromCharCode(160);
-Chart.defaults.borderColor = font;
-Chart.defaults.color = font;
-Chart.defaults.animation = false;
+const white = '#FFFFFF';
+const light_blue = '#89CFF0';
 
-let time_input;
+// non compressable space -- used for spaces between divs
+const space = String.fromCharCode(160);
+
+// defaults for chart
+Chart.defaults.borderColor = white;
+Chart.defaults.color = white;
+Chart.defaults.animation = false;
 
 /**
  * Stores a solve's time, if the solve is a plus two, and if the solve is a DNF.
@@ -465,15 +469,15 @@ function add_to_parent(parent, text, class_name) {
 }
 
 function on_hover(event, tooltip_div) {
-    event.target.style.color = hover;
+    event.target.style.color = light_blue;
     tooltip_div.style.visibility = 'visible';
     // necessary to prevent tooltip from inherenting the parent's hover color
     // there is probably a better way to prevent this, but this works fine
-    tooltip_div.style.color = font;
+    tooltip_div.style.color = white;
 }
 
 function off_hover(event, tooltip_div) {
-    event.target.style.color = font;
+    event.target.style.color = white;
     tooltip_div.style.visibility = 'hidden';
 }
 
@@ -787,7 +791,7 @@ function clean_divs() {
     }
 }
 
-function main() {
+function draw_screen(time_input) {
     clean_divs();
 
     const graph_min = min_input.value;
@@ -807,30 +811,35 @@ function main() {
         );
 }
 
-// call main with specific input method
-file_input_div.addEventListener('change', () => {
-    const reader = new FileReader();
-    const file = file_input_div.files[0];
+function main() {
+    let time_input;
+    // draw screen with specific input method
+    file_input_div.addEventListener('change', () => {
+        const reader = new FileReader();
+        const file = file_input_div.files[0];
 
-    // TODO: use arraybuffer?
-    reader.readAsText(file);
-    reader.onload = () => {
-        text_input_div.value = '';
-        time_input = csv_parse(reader.result);
-        main();
-    };
-});
+        // TODO: use arraybuffer?
+        reader.readAsText(file);
+        reader.onload = () => {
+            text_input_div.value = '';
+            time_input = csv_parse(reader.result);
+            draw_screen(time_input);
+        };
+    });
 
-text_input_div.addEventListener('input', () => {
-    file_input_div.value = '';
-    time_input = text_parse(text_input_div.value);
-    main();
-});
+    text_input_div.addEventListener('input', () => {
+        file_input_div.value = '';
+        time_input = text_parse(text_input_div.value);
+        draw_screen(time_input);
+    });
 
-// otherwise just call main
-min_input.addEventListener('input', main);
-max_input.addEventListener('input', main);
-numsolves_input.addEventListener('input', main);
-step_input.addEventListener('input', main);
-average_input.addEventListener('input', main);
-streak_input.addEventListener('input', main);
+    // otherwise just draw screen
+    min_input.addEventListener('input', () => draw_screen(time_input));
+    max_input.addEventListener('input', () => draw_screen(time_input));
+    numsolves_input.addEventListener('input', () => draw_screen(time_input));
+    step_input.addEventListener('input', () => draw_screen(time_input));
+    average_input.addEventListener('input', () => draw_screen(time_input));
+    streak_input.addEventListener('input', () => draw_screen(time_input));
+}
+
+main();
