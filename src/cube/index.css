@@ -61,8 +61,10 @@ input {
 
 .tooltip {
     position: absolute;
-    background-color: rgb(37, 37, 37);
-    max-width: 30vw;
+    background-color: rgb(255, 255, 255);
+    padding-left: 6px;
+    padding-right: 6px;
+    max-width: 27vw;
     max-height: 25vh;
     overflow-y: auto;
 }

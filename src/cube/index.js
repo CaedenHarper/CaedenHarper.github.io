@@ -8,12 +8,13 @@ const avg_div = document.getElementById('avg');
 const streak_div = document.getElementById('streak');
 const file_input_div = document.getElementById('file-input');
 const text_input_div = document.getElementById('text-input');
+const total_time_div = document.getElementById('total_time');
 const total_div = document.getElementById('total');
-const dnf_div = document.getElementById('DNF');
-const plus_two_div = document.getElementById('plus_two');
 const best_time_div = document.getElementById('best_time');
 const worst_time_div = document.getElementById('worst_time');
-const total_time_div = document.getElementById('total_time');
+const dnf_div = document.getElementById('DNF');
+const plus_two_div = document.getElementById('plus_two');
+const mean_div = document.getElementById('mean');
 // global average
 const min_input = document.getElementById('min-input');
 const max_input = document.getElementById('max-input');
@@ -25,12 +26,13 @@ const streak_input = document.getElementById('streak-input');
 // colors
 const blue = '#0163C3';
 const white = '#FFFFFF';
+const black = '#000000';
 const light_blue = '#89CFF0';
 
 // non compressable space -- used for spaces between divs
 const space = String.fromCharCode(160);
 
-// defaults for chart
+// defaults for charts
 Chart.defaults.borderColor = white;
 Chart.defaults.color = white;
 Chart.defaults.animation = false;
@@ -357,8 +359,6 @@ function validate_average_list(average_list) {
         // if num is an integer, add to dict
         num = parseInt(num, 10);
         if (Number.isInteger(num)) {
-            // TODO: consider making this a class
-            // index 0 is
             average_dict[num] = [];
         }
     }
@@ -473,7 +473,7 @@ function on_hover(event, tooltip_div) {
     tooltip_div.style.visibility = 'visible';
     // necessary to prevent tooltip from inherenting the parent's hover color
     // there is probably a better way to prevent this, but this works fine
-    tooltip_div.style.color = white;
+    tooltip_div.style.color = black;
 }
 
 function off_hover(event, tooltip_div) {
@@ -481,6 +481,7 @@ function off_hover(event, tooltip_div) {
     tooltip_div.style.visibility = 'hidden';
 }
 
+// TODO: refactor
 /**
  * Print statistics onto the screen.
  * @param {string} file_or_text - CSV file directory or text input.
@@ -506,18 +507,14 @@ function print_stats(
         return;
     }
 
-    // solve_nums first to update times
+    // validate solve_nums and update times
     solve_nums = validate_solve_nums(times, solve_nums);
     times = times.slice(solve_nums, (times.length + 1));
 
+    // validate everything else
     const average_dict = validate_average_list(average_list);
-
-    const graphs = validate_graphs(graph_min, graph_max);
-    graph_min = graphs[0];
-    graph_max = graphs[1];
-
+    [graph_min, graph_max] = validate_graphs(graph_min, graph_max);
     step = validate_step(step);
-
     const streak_dict = validate_streaks(streaks);
 
     let total = 0;
@@ -640,9 +637,6 @@ function print_stats(
         return;
     }
 
-    // show total in html
-    total_div.textContent = `Total solves: ${total}`;
-
     const chart = Chart.getChart('graph');
     const graph = document.getElementById('graph');
 
@@ -650,7 +644,7 @@ function print_stats(
         chart.destroy();
     }
 
-    // remove 0 count datasets at the front and end
+    // remove 0 count datasets at the front
     graph_data.pop();
     if (graph_data.length > 0) {
         new Chart( // eslint-disable-line no-new
@@ -678,41 +672,35 @@ function print_stats(
         );
     }
 
-    // show DNF count in html
-    // dnf_div.textContent = `DNFs: ${num_dnf}`;
-    add_to_parent(dnf_div, 'DNFs', 'remove-refresh one-line red');
-    add_to_parent(dnf_div, `:${space}`, 'remove-refresh one-line');
-    add_to_parent(dnf_div, `${num_dnf}`, 'remove-refresh one-line');
-    // const mouse_over_dnf = add_to_parent(dnf_div, `${num_dnf}`, 'remove-refresh one-line');
-    // mouse_over_dnf.addEventListener('mouseover', on_hover);
-    // mouse_over_dnf.addEventListener('mouseout', off_hover);
+    // TODO: refactor
 
-    // show +2 count in html
-    add_to_parent(plus_two_div, '+2s', 'remove-refresh one-line red');
-    add_to_parent(plus_two_div, `:${space}`, 'remove-refresh one-line');
-    add_to_parent(plus_two_div, `${num_plus_two}`, 'remove-refresh one-line');
-    // const mouse_over_plus_two = add_to_parent(plus_two_div,
-    // `${num_plus_two}`, 'remove-refresh one-line');
-    // mouse_over_plus_two.addEventListener('mouseover', on_hover);
-    // mouse_over_plus_two.addEventListener('mouseout', off_hover);
+    // show total in html
+    total_div.textContent = `Total solves: ${total}`;
 
     // show best time in html
     add_to_parent(best_time_div, 'Best', 'remove-refresh one-line green');
     add_to_parent(best_time_div, `${space}time:${space}`, 'remove-refresh one-line');
     add_to_parent(best_time_div, `${best_time.toFixed(2)}`, 'remove-refresh one-line');
-    // const mouse_over_best_time = add_to_parent(best_time_div,
-    // `${best_time.toFixed(2)}`, 'remove-refresh one-line');
-    // mouse_over_best_time.addEventListener('mouseover', on_hover);
-    // mouse_over_best_time.addEventListener('mouseout', off_hover);
 
     // show worst time in html
     add_to_parent(worst_time_div, 'Worst', 'remove-refresh one-line red');
     add_to_parent(worst_time_div, `${space}time:${space}`, 'remove-refresh one-line');
     add_to_parent(worst_time_div, `${worst_time.toFixed(2)}`, 'remove-refresh one-line');
-    // const mouse_over_worst_time = add_to_parent(worst_time_div,
-    // `${worst_time.toFixed(2)}`, 'remove-refresh one-line');
-    // mouse_over_worst_time.addEventListener('mouseover', on_hover);
-    // mouse_over_worst_time.addEventListener('mouseout', off_hover);
+
+    // show mean time in html
+    const mean_time = total_time_solving / (total - num_dnf);
+    mean_div.textContent = `Mean: ${mean_time.toFixed(2)}`;
+
+    // show DNF count in html
+    // dnf_div.textContent = `DNFs: ${num_dnf}`;
+    add_to_parent(dnf_div, 'DNFs', 'remove-refresh one-line red');
+    add_to_parent(dnf_div, `:${space}`, 'remove-refresh one-line');
+    add_to_parent(dnf_div, `${num_dnf}`, 'remove-refresh one-line');
+
+    // show +2 count in html
+    add_to_parent(plus_two_div, '+2s', 'remove-refresh one-line red');
+    add_to_parent(plus_two_div, `:${space}`, 'remove-refresh one-line');
+    add_to_parent(plus_two_div, `${num_plus_two}`, 'remove-refresh one-line');
 
     const average_keys = Object.keys(average_dict);
     for (let i = 0; i < average_keys.length; i += 1) {
@@ -728,8 +716,8 @@ function print_stats(
         const worst = worst_avg.getTime.toFixed(2);
         // show best, worst avg in html (I.E., Best Average of {KEY} = Best)
         const best_parent = add_to_parent(avg_div, '', 'remove-refresh');
-        add_to_parent(best_parent, `Best ao${key}`, 'remove-refresh green one-line');
-        add_to_parent(best_parent, `:${space}`, 'remove-refresh one-line');
+        add_to_parent(best_parent, 'Best', 'remove-refresh green one-line');
+        add_to_parent(best_parent, `${space}ao${key}:${space}`, 'remove-refresh one-line');
         const mouse_over_best = add_to_parent(best_parent, `${best}`, 'remove-refresh one-line');
 
         // add list of solves on mouseover
@@ -739,8 +727,8 @@ function print_stats(
         mouse_over_best.addEventListener('mouseout', (event) => off_hover(event, best_tooltip));
 
         const worst_parent = add_to_parent(avg_div, '', 'remove-refresh');
-        add_to_parent(worst_parent, `Worst ao${key}`, 'remove-refresh red one-line');
-        add_to_parent(worst_parent, `:${space}`, 'remove-refresh one-line');
+        add_to_parent(worst_parent, 'Worst', 'remove-refresh red one-line');
+        add_to_parent(worst_parent, `${space}ao${key}:${space}`, 'remove-refresh one-line');
         const mouse_over_worst = add_to_parent(worst_parent, `${worst}`, 'remove-refresh one-line');
 
         // add list of solves on mouseover
@@ -762,8 +750,8 @@ function print_stats(
 
         const streak_num = parseFloat(streak);
         const streak_parent = add_to_parent(streak_div, '', 'remove-refresh');
-        add_to_parent(streak_parent, `Best streak under ${streak_num.toFixed(2)}`, 'remove-refresh green one-line');
-        add_to_parent(streak_parent, `: ${best_streak}`, 'remove-refresh one-line');
+        add_to_parent(streak_parent, 'Best', 'remove-refresh green one-line');
+        add_to_parent(streak_parent, `${space}streak under ${streak_num.toFixed(2)}: ${best_streak}`, 'remove-refresh one-line');
     }
 
     // show total time solving in html
