@@ -42,18 +42,6 @@ div {
     top: 0;
 }
 
-.child {
-    /* TODO: add fallback font-size */
-    /* This strange font size looks the best out of all the ones I tried;
-    Maybe I should change it sometime soon, but it works fine. */
-    text-align: center;
-    
-    /* debug */
-    /* border-style: solid;
-    border-width: 1px;
-    border-color: black; */
-}
-
 a {
     padding: 1.5vw;
     text-decoration: none;
