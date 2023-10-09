@@ -3,7 +3,8 @@ const countDownDate = new Date('Oct 19, 2023 21:10:00').getTime();
 const main_countdown = document.getElementById('time');
 const second_countdown = document.getElementById('hours');
 const celebration_emoji = String.fromCodePoint(127881);
-const all_units = ['hours', 'minutes', 'seconds', 'fortnights', 'dog_hours', 'usain_bolt_100_meters', 'pizza_hut'];
+const all_units = ['hours', 'minutes', 'seconds', 'fortnights', 'dog_hours',
+'usain_bolt_100_meters', 'pizza_hut', 'chopin'];
 let current_unit = 'hours';
 
 // init. globally
@@ -12,6 +13,8 @@ let days = 0;
 let hours = 0;
 let minutes = 0;
 let seconds = 0;
+
+// TODO: refactor; make dynamic/automatic
 
 function display_countdown() {
     if (distance < 0) {
@@ -97,6 +100,17 @@ function display_pizza_hut() {
     }
 }
 
+function display_chopin() {
+    const full_seconds = days * 24 * 60 * 60 + hours * 60 * 60 + minutes * 60 + seconds;
+    const num_chopin_hours = Math.round(2 * (full_seconds / (60 * 60)));
+    if (distance < 0 || num_chopin_hours <= 0) {
+        second_countdown.textContent = '';
+    } else {
+        second_countdown.textContent = `(${num_chopin_hours} Chopin hours)`;
+    }
+}
+
+// TODO: refactor
 function current_unit_display() {
     switch (current_unit) {
         case 'hours':
@@ -119,6 +133,9 @@ function current_unit_display() {
             break;
         case 'pizza_hut':
             display_pizza_hut();
+            break;
+        case 'chopin':
+            display_chopin();
             break;
         default:
             display_hours(distance, days, hours);
