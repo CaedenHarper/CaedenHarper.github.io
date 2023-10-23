@@ -15,7 +15,6 @@ const worst_time_div = document.getElementById('worst_time');
 const dnf_div = document.getElementById('DNF');
 const plus_two_div = document.getElementById('plus_two');
 const mean_div = document.getElementById('mean');
-// global average
 const min_input = document.getElementById('min-input');
 const max_input = document.getElementById('max-input');
 const numsolves_input = document.getElementById('numsolves-input');
