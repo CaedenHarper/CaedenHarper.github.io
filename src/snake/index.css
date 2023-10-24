@@ -1,0 +1,15 @@
+/* import main style */
+@import "../index.css";
+
+/* remove scrolling
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+} */
+
+#snake {
+    position: absolute;
+    top: 0;
+    left: 0;
+}

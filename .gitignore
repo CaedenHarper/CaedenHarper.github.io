@@ -2,4 +2,3 @@ node_modules
 dist
 .parcel-cache
 .eslintrc.json
-src/snake

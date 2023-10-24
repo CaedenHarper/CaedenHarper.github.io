@@ -4,7 +4,7 @@ const main_countdown = document.getElementById('time');
 const second_countdown = document.getElementById('hours');
 const celebration_emoji = String.fromCodePoint(127881);
 const all_units = ['hours', 'minutes', 'seconds', 'fortnights', 'dog_hours',
-'usain_bolt_100_meters', 'pizza_hut', 'chopin'];
+'usain_bolt_100_meters', 'pizza_hut', 'chopin', 'pills'];
 let current_unit = 'hours';
 
 // init. globally
@@ -110,7 +110,16 @@ function display_chopin() {
     }
 }
 
-// TODO: refactor
+function display_pills() {
+    const num_pills = 16 * days;
+    if (distance < 0 || num_pills <= 0) {
+        second_countdown.textContent = '';
+    } else {
+        second_countdown.textContent = `(${num_pills} pills)`;
+    }
+}
+
+// TODO: refactor !!!!!
 function current_unit_display() {
     switch (current_unit) {
         case 'hours':
@@ -136,6 +145,9 @@ function current_unit_display() {
             break;
         case 'chopin':
             display_chopin();
+            break;
+        case 'pills':
+            display_pills();
             break;
         default:
             display_hours(distance, days, hours);
