@@ -1,4 +1,4 @@
-const countDownDate = new Date('Nov 2, 2023 21:10:00').getTime();
+const countDownDate = new Date('Dec 13, 2023 19:10:00').getTime();
 // let countDownDate = new Date('Sep 12, 2023 9:09:00').getTime();
 const main_countdown = document.getElementById('time');
 const second_countdown = document.getElementById('hours');
