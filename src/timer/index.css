@@ -1,2 +1,10 @@
 /* import main style */
 @import "../index.css";
+
+.pay {
+    color: #a6e481
+}
+
+#pay_time {
+    padding: 8vh
+}
