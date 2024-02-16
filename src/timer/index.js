@@ -1,6 +1,6 @@
-const countDownDate = new Date('Feb 8, 2024 19:10:00').getTime();
-const payCheckDate = new Date('Feb 14, 2024 00:00:00').getTime();
-// let countDownDate = new Date('Sep 12, 2023 9:09:00').getTime();
+// old, worse date input style
+const countDownDate = new Date('Feb 29, 2024 18:10:00').getTime();
+const payCheckDate = new Date('Feb 14, 2024 06:00:00').getTime();
 const main_countdown = document.getElementById('time');
 const main_secondary = document.getElementById('hours');
 const pay_countdown = document.getElementById('pay_time');
