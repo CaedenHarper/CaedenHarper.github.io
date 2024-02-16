@@ -1,3 +1,5 @@
+// refactor!
+
 const unchecked_box = String.fromCodePoint(9744);
 const checked_box = String.fromCodePoint(9745);
 const main_div = document.getElementById('main_div');
