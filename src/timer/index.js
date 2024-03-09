@@ -252,7 +252,7 @@ class SubTimer {
 
 const timers = [];
 
-const countDownDate = new Date('Feb 29, 2024 18:10:00');
+const countDownDate = new Date('Mar 13, 2024 21:10:00');
 const payCheckDate = new Date('Feb 14, 2024 06:00:00');
 
 const countDownTimer = new Timer(countDownDate, false, celebration_emoji, 'countdown', '');
