@@ -1,8 +1,9 @@
 const main_div = document.getElementById('main_div');
 const celebration_emoji = String.fromCodePoint(127881);
 const all_units = ['hours', 'minutes', 'seconds', 'fortnights', 'dog_hours',
-'usain_bolt_100_meters', 'pizza_hut', 'chopin', 'pills'];
+'usain_bolt_100_meters', 'pizza_hut', 'chopin', 'pills', 'calls'];
 
+// TODO: add color option
 class Timer {
     constructor(date, repeating, final, id_name, class_name) {
         this.date = date;
@@ -103,10 +104,14 @@ class SubTimer {
         this.hours = Math.floor((this.distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         this.minutes = Math.floor((this.distance % (1000 * 60 * 60)) / (1000 * 60));
         this.seconds = Math.floor((this.distance % (1000 * 60)) / 1000);
+        // full seconds used for some display functions
+        this.full_seconds = this.days * 24 * 60 * 60 + this.hours * 60 * 60
+        + this.minutes * 60 + this.seconds;
 
         this.current_unit_display();
     }
 
+    // TODO: refactor each of these display functions
     display_hours() {
         const full_hours = this.days * 24 + this.hours;
         if (this.distance < 0) {
@@ -126,21 +131,17 @@ class SubTimer {
     }
 
     display_seconds() {
-        const full_seconds = this.days * 24 * 60 * 60 + this.hours * 60 * 60
-        + this.minutes * 60 + this.seconds;
         if (this.distance < 0) {
             this.html_element.textContent = '0 seconds';
         } else {
-            this.html_element.textContent = `(${full_seconds} seconds)`;
+            this.html_element.textContent = `(${this.full_seconds} seconds)`;
         }
     }
 
     display_fortnights() {
-        // fortnight = 2 weeks = 14 this.days = 1,210,000 seconds
-        const full_seconds = this.days * 24 * 60 * 60 + this.hours * 60 * 60
-        + this.minutes * 60 + this.seconds;
+        // fortnight = 2 weeks = 14 days = 1,210,000 seconds
         const fortnight_constant = 1210000;
-        const num_fortnights = (full_seconds / (1.0 * fortnight_constant)).toFixed(4);
+        const num_fortnights = (this.full_seconds / (1.0 * fortnight_constant)).toFixed(1);
         if (this.distance < 0) {
             this.html_element.textContent = '';
         } else {
@@ -149,9 +150,7 @@ class SubTimer {
     }
 
     display_dog_hours() {
-        const full_seconds = this.days * 24 * 60 * 60 + this.hours * 60 * 60
-        + this.minutes * 60 + this.seconds;
-        const num_dog_seconds = (full_seconds * 7);
+        const num_dog_seconds = (this.full_seconds * 7);
         const num_dog_hours = Math.round(num_dog_seconds / (60 * 60));
         if (this.distance < 0) {
             this.html_element.textContent = '';
@@ -161,9 +160,7 @@ class SubTimer {
     }
 
     display_usain_bolt_100_meters() {
-        const full_seconds = this.days * 24 * 60 * 60 + this.hours * 60 * 60
-        + this.minutes * 60 + this.seconds;
-        const num_usain_bolt = Math.round(full_seconds / (9.58));
+        const num_usain_bolt = Math.round(this.full_seconds / (9.58));
         if (this.distance < 0) {
             this.html_element.textContent = '';
         } else {
@@ -172,9 +169,7 @@ class SubTimer {
     }
 
     display_pizza_hut() {
-        const full_seconds = this.days * 24 * 60 * 60 + this.hours * 60 * 60
-        + this.minutes * 60 + this.seconds;
-        const num_pizza_hut = Math.round(full_seconds / (15 * 60));
+        const num_pizza_hut = Math.round(this.full_seconds / (15 * 60));
         if (this.distance < 0) {
             this.html_element.textContent = '';
         } else {
@@ -183,9 +178,7 @@ class SubTimer {
     }
 
     display_chopin() {
-        const full_seconds = this.days * 24 * 60 * 60 + this.hours * 60 * 60
-        + this.minutes * 60 + this.seconds;
-        const num_chopin_hours = Math.round(2 * (full_seconds / (60 * 60)));
+        const num_chopin_hours = Math.round(2 * (this.full_seconds / (60 * 60)));
         if (this.distance < 0) {
             this.html_element.textContent = '';
         } else {
@@ -194,7 +187,7 @@ class SubTimer {
     }
 
     display_pills() {
-        const num_pills = 16 * this.days;
+        const num_pills = Math.round(16 * (this.full_seconds / 86400));
         if (this.distance < 0) {
             this.html_element.textContent = '';
         } else {
@@ -202,6 +195,17 @@ class SubTimer {
         }
     }
 
+    display_calls() {
+        // each call is about 13.5 minutes
+        const num_calls = Math.round((this.full_seconds / 60) / 13.5);
+        if (this.distance < 0) {
+            this.html_element.textContent = '';
+        } else {
+            this.html_element.textContent = `(${num_calls} calls)`;
+        }
+    }
+
+    // TODO: refactor
     current_unit_display() {
         switch (this.current_unit) {
             case 'hours':
@@ -231,6 +235,9 @@ class SubTimer {
             case 'pills':
                 this.display_pills();
                 break;
+            case 'calls':
+                this.display_calls();
+                break;
             default:
                 this.display_hours();
                 break;
@@ -252,15 +259,20 @@ class SubTimer {
 
 const timers = [];
 
-const countDownDate = new Date('Mar 13, 2024 21:10:00');
-const payCheckDate = new Date('Feb 14, 2024 06:00:00');
-
+const countDownDate = new Date('Mar 28, 2024 18:10:00');
 const countDownTimer = new Timer(countDownDate, false, celebration_emoji, 'countdown', '');
 const countDownSubTimer = new SubTimer(countDownDate, false, 'countdownsub', '');
-const payCheckTimer = new Timer(payCheckDate, true, '', 'paycheck', 'pay');
-const payCheckSubTimer = new SubTimer(payCheckDate, true, 'paycheck', 'pay');
+timers.push(countDownTimer, countDownSubTimer);
 
-timers.push(countDownTimer, countDownSubTimer, payCheckTimer, payCheckSubTimer);
+const payCheckDate = new Date('Feb 14, 2024 06:00:00');
+const payCheckTimer = new Timer(payCheckDate, true, '', 'paycheck', 'pay');
+const payCheckSubTimer = new SubTimer(payCheckDate, true, 'paychecksub', 'pay');
+timers.push(payCheckTimer, payCheckSubTimer);
+
+const gradDate = new Date('May 17, 2024 00:00:00');
+const gradDateTimer = new Timer(gradDate, false, '', 'graddate', 'grad');
+const gradDateSubTimer = new SubTimer(gradDate, false, 'graddatesub', 'grad');
+timers.push(gradDateTimer, gradDateSubTimer);
 
 function main() {
     const current_time = new Date().getTime();
