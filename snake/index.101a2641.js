@@ -1,0 +1,3 @@
+document.getElementById("main_div");const e=document.getElementById("snake"),t=window.screen.availWidth,n=window.screen.availHeight;let r=1,i=0,o=0,d=0;window.addEventListener("keydown",e=>{!function(e){if("ArrowUp"===e||"w"===e){i=-1,r=0;return}if("ArrowDown"===e||"s"===e){i=1,r=0;return}if("ArrowLeft"===e||"a"===e){i=0,r=-1;return}("ArrowRight"===e||"d"===e)&&(i=0,r=1)}(e.key)}),setInterval(function(){o+=16.66666*r,d+=16.66666*i,o>t&&(o=t),o<0&&(o=0),d>n&&(d=n),d<0&&(d=0),e.style.top=`${d}px`,e.style.left=`${o}px`},16.66666);//# sourceMappingURL=index.101a2641.js.map
+
+//# sourceMappingURL=index.101a2641.js.map
