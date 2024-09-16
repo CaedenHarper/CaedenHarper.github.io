@@ -1,5 +1,5 @@
 const main_div = document.getElementById('main_div');
-const celebration_emoji = String.fromCodePoint(127881);
+// const celebration_emoji = String.fromCodePoint(127881);
 const all_units = ['hours', 'minutes', 'seconds', 'fortnights', 'dog_hours',
 'usain_bolt_100_meters', 'pizza_hut', 'chopin', 'pills', 'calls'];
 
@@ -259,20 +259,20 @@ class SubTimer {
 
 const timers = [];
 
-const countDownDate = new Date('Mar 28, 2024 18:10:00');
-const countDownTimer = new Timer(countDownDate, false, celebration_emoji, 'countdown', '');
-const countDownSubTimer = new SubTimer(countDownDate, false, 'countdownsub', '');
-timers.push(countDownTimer, countDownSubTimer);
+// const countDownDate = new Date('Mar 28, 2024 18:10:00');
+// const countDownTimer = new Timer(countDownDate, false, celebration_emoji, 'countdown', '');
+// const countDownSubTimer = new SubTimer(countDownDate, false, 'countdownsub', '');
+// timers.push(countDownTimer, countDownSubTimer);
 
 const payCheckDate = new Date('Feb 14, 2024 06:00:00');
 const payCheckTimer = new Timer(payCheckDate, true, '', 'paycheck', 'pay');
 const payCheckSubTimer = new SubTimer(payCheckDate, true, 'paychecksub', 'pay');
 timers.push(payCheckTimer, payCheckSubTimer);
 
-const gradDate = new Date('May 17, 2024 00:00:00');
-const gradDateTimer = new Timer(gradDate, false, '', 'graddate', 'grad');
-const gradDateSubTimer = new SubTimer(gradDate, false, 'graddatesub', 'grad');
-timers.push(gradDateTimer, gradDateSubTimer);
+// const gradDate = new Date('May 17, 2024 00:00:00');
+// const gradDateTimer = new Timer(gradDate, false, '', 'graddate', 'grad');
+// const gradDateSubTimer = new SubTimer(gradDate, false, 'graddatesub', 'grad');
+// timers.push(gradDateTimer, gradDateSubTimer);
 
 function main() {
     const current_time = new Date().getTime();
