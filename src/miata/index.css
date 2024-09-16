@@ -1,0 +1,87 @@
+/* import main style */
+@import "../index.css";
+
+div {
+    /* fallback font-size */
+    font-size: 30px;
+
+    /* This strange font size looks the best out of all the ones I tried;
+    Maybe I should change it sometime soon, but it works fine. */
+    font-size: calc(1.25vw + 1.25vh);
+    color: white;
+}
+
+#main_div {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.noscroll::-webkit-scrollbar {
+    display: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+    appearance:textfield;
+    -moz-appearance:textfield; /* Firefox */
+}
+
+input {
+    width: 6vw;
+}
+
+#div-container {
+    flex-direction: row;
+    align-items: flex-start;    
+    justify-content: space-evenly;
+    /* background-color: aqua; */
+    flex: auto;
+}
+
+.one-line {
+    display: inline-block;
+}
+
+.sideways {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    /* align-items: center;  */
+    width: 99vw;
+    gap: 10px;
+    
+    /* margin: auto; */
+
+    /* background-color: aqua; */
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 31vh;
+}
+
+.settings {
+    /* align-items: flex-start; */
+    flex: auto;
+    gap: 2px;
+}
+
+.setting-div {
+    /* fallback font-size */
+    font-size: 30px;
+
+    /* This strange font size looks the best out of all the ones I tried;
+    Maybe I should change it sometime soon, but it works fine. */
+    font-size: calc(1.15vw + 1.15vh);
+    /* background-color: aqua; */
+}
