@@ -2,12 +2,7 @@
 @import "../index.css";
 
 div {
-    /* fallback font-size */
-    font-size: 30px;
-
-    /* This strange font size looks the best out of all the ones I tried;
-    Maybe I should change it sometime soon, but it works fine. */
-    font-size: calc(1.25vw + 1.25vh);
+    font-size: 2.5vw;
     color: white;
 }
 
@@ -33,55 +28,23 @@ input[type=number] {
     -moz-appearance:textfield; /* Firefox */
 }
 
+/* remove border on inputs */
 input {
-    width: 6vw;
-}
-
-#div-container {
-    flex-direction: row;
-    align-items: flex-start;    
-    justify-content: space-evenly;
-    /* background-color: aqua; */
-    flex: auto;
+    width: 12vw;
+    height: 4vh;
+    /* black */
+    background-color: #0d0404;
+    color: rgb(143, 205, 244);
+    font-size: 2.5vw;
+    font-family: "Times New Roman";
+    font-weight: bold;
+    border: 0;
 }
 
 .one-line {
     display: inline-block;
 }
 
-.sideways {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    /* align-items: center;  */
-    width: 99vw;
-    gap: 10px;
-    
-    /* margin: auto; */
-
-    /* background-color: aqua; */
-}
-
-.column {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    height: 31vh;
-}
-
-.settings {
-    /* align-items: flex-start; */
-    flex: auto;
-    gap: 2px;
-}
-
-.setting-div {
-    /* fallback font-size */
-    font-size: 30px;
-
-    /* This strange font size looks the best out of all the ones I tried;
-    Maybe I should change it sometime soon, but it works fine. */
-    font-size: calc(1.15vw + 1.15vh);
-    /* background-color: aqua; */
+#timer, #date {
+    font-size: 4vw;
 }

@@ -9,33 +9,40 @@
     </head>
     <body>
         <div id="main_div">
-            <div id="timer">. . .</div>
+            <div id="timer">? days</div>
+            <div id="date">Jan. 1, 1970</div>
             <div id="num-settings">
                 <div class="setting-div">
-                    Bi-weekly Paycheck: 
-                    <input type="number" id="paycheck" min="0" placeholder="2000"></input>
+                    Bi-weekly Paycheck:
+                    <input type="number" id="paycheck" step="any" min="0" placeholder="0" value="2000"></input>
                 </div>
                 <div class="setting-div">
                     Bi-weekly Budget:
-                    <input type="number" id="biweekly-budget" min="0" placeholder="420"></input>
+                    <input type="number" id="biweekly-budget" step="any" min="0" placeholder="0" value="420"></input>
                 </div>
                 <div class="setting-div">
                     Daily Budget: 
-                    <input type="number" id="daily-budget" min="0" placeholder="30"></input>
+                    <input type="number" id="daily-budget" step="any" min="0" placeholder="0" value="30"></input>
                 </div>
                 <div class="setting-div">
                     Miata Cost: 
-                    <input type="number" id="miata-cost" min="0" placeholder="5000"></input>
+                    <input type="number" id="miata-cost" step="any" min="0" placeholder="0" value="5000"></input>
                 </div>
                 <div class="setting-div">
                     Tax Rate: 
-                    <input type="number" id="tax-rate" min="0" value="0.0725"></input>
+                    <input type="number" id="tax-rate" step="any" min="0" placeholder="0" value="0.0725"></input>
                 </div>
                 <div class="setting-div">
-                    Total Cost: 
-                    <div id="total-cost" class="one-line">???</div>
+                    Already Saved:
+                    <input type="number" id="already-saved" step="any" min="0" placeholder="0" value="0"></input>
+                </div>
+                <div class="setting-div">
+                    Total Cost:
+                    <div id="total-cost" class="one-line">$</div>
                 </div>
             </div>
+            <!-- TODO: add "errors" -->
+            <!-- <div id="error">test</div> -->
         </div>
         <script type="module" src="index.js"></script>
     </body>
