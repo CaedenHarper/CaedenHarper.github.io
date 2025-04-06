@@ -1,5 +1,3 @@
-import Chart from 'chart.js/auto';
-
 // initialize constants
 // divs
 const previous_quota_div = document.getElementById('previous-quota');
@@ -11,20 +9,6 @@ const highest_quota_div = document.getElementById('highest-next-quota');
 const percentile_div = document.getElementById('percentile');
 const lowest_quota_num_div = document.getElementById('lowest-quota-num');
 const highest_quota_num_div = document.getElementById('highest-quota-num');
-
-// colors
-const blue = '#0163C3';
-const white = '#FFFFFF';
-const black = '#000000';
-const light_blue = '#89CFF0';
-
-// non compressable space -- used for spaces between divs
-const space = String.fromCharCode(160);
-
-// defaults for charts
-Chart.defaults.borderColor = white;
-Chart.defaults.color = white;
-Chart.defaults.animation = false;
 
 function next_quota(previous_quota, quota_num, random_variance) {
     return Math.trunc(
@@ -45,7 +29,7 @@ function average_next_quota(previous_quota, quota_num) {
 }
 
 function quota_to_percentile(quota, previous_quota, quota_num) {
-    return Math.trunc(((quota - previous_quota) / (100 * (1 + ((quota_num - 1) ** 2) / 16))) - 0.5);
+    return ((quota - previous_quota) / (100 * (1 + ((quota_num - 1) ** 2) / 16))) - 0.5;
 }
 
 function find_quota_range(goal_quota) {
@@ -80,13 +64,6 @@ function clean_divs() {
     percentile_div.textContent = 'Percentile: ';
     lowest_quota_num_div.textContent = 'Quota Num Lower Bound: ';
     highest_quota_num_div.textContent = 'Quota Num Upper Bound: ';
-
-    // destroy graph
-    const chart = Chart.getChart('graph');
-
-    if (chart !== undefined) {
-        chart.destroy();
-    }
 }
 
 function draw_screen() {
