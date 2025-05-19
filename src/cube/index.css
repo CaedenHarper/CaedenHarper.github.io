@@ -38,6 +38,11 @@ input[type=number] {
     -moz-appearance:textfield; /* Firefox */
 }
 
+/* increase checkbox size */
+input[type=checkbox] {
+    transform: scale(1.5);
+}
+
 input {
     width: 4vw;
 }

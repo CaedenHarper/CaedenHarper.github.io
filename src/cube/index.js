@@ -1,6 +1,12 @@
 import Chart from 'chart.js/auto';
 // TODO:
 // add line graph
+// implement cache
+// increase speed
+// add unit / e2e / perf testing
+// refactor into typescript
+// add much more logging
+// fix mean not going away
 
 // initialize constants
 // divs
@@ -21,6 +27,8 @@ const numsolves_input = document.getElementById('numsolves-input');
 const step_input = document.getElementById('step-input');
 const average_input = document.getElementById('average-input');
 const streak_input = document.getElementById('streak-input');
+const ignore_dnf_input = document.getElementById('ignore-dnf-input');
+const ignore_plus_two_input = document.getElementById('ignore-plus-two-input');
 
 // colors
 const blue = '#0163C3';
@@ -52,16 +60,12 @@ class CubeTime {
         this.dnf = dnf;
     }
 
-    get getNum() {
-        return this.num;
-    }
-
-    get getPlusTwo() {
-        return this.plus_two;
-    }
-
-    get getDNF() {
-        return this.dnf;
+    /**
+     * Make a copy of the time.
+     * @returns {CubeTime}
+     */
+    copy() {
+        return new CubeTime(this.num, this.plus_two, this.dnf);
     }
 
     /**
@@ -95,22 +99,6 @@ class Average {
         this.time = time;
         this.dnf = dnf;
         this.solves = solves;
-    }
-
-    get getAmount() {
-        return this.amount;
-    }
-
-    get getTime() {
-        return this.time;
-    }
-
-    get getDNF() {
-        return this.dnf;
-    }
-
-    get getSolves() {
-        return this.solves;
     }
 
     /**
@@ -198,6 +186,9 @@ function text_parse(solves) {
     return times;
 }
 
+// TODO: combine csv_parse and text_parse
+// or refactor to both use one underlying function
+
 /**
  * Parses a csv file containing a list of solves into an array of CubeTimes.
  * @param {string} file_content - String resulting from file to parse
@@ -266,12 +257,13 @@ function times_to_time_nums(times) {
     const time_nums = [];
     for (let i = 0; i < times.length; i += 1) {
         const time = times[i];
-        time_nums.push(time.getNum);
+        time_nums.push(time.num);
     }
     return time_nums;
 }
 
 // TODO: refactor; increase speed
+// TODO: implement cache
 /**
  * Calculates average of n solves from given list with length n.
  * @param {CubeTime[]} times
@@ -295,9 +287,9 @@ function average_of_n(times) {
     const times_to_remove = [];
     for (let i = 0; i < times.length; i += 1) {
         const time = times[i];
-        if (time.getDNF) {
+        if (time.dnf) {
             num_dnfs += 1;
-            DNFs.push(time.getNum);
+            DNFs.push(time.num);
             times_to_remove.push(time);
         }
     }
@@ -480,9 +472,10 @@ function off_hover(event, tooltip_div) {
     tooltip_div.style.visibility = 'hidden';
 }
 
-// TODO: refactor
+// TODO: refactor into multiple functions
 /**
  * Print statistics onto the screen.
+ * @param {CubeTime[]} times - Solve times to process.
  * @param {string} file_or_text - CSV file directory or text input.
  * @param {Number[]} average_list - Averages to calculate average of n for.
  * @param {Number} graph_min - Positive integer that is the minimum point of graph.
@@ -490,6 +483,8 @@ function off_hover(event, tooltip_div) {
  * @param {Number} solve_nums - Positive integer of solves to include.
  * @param {Number} step - Positive integer of distance between each point in time spread.
  * @param {Number[]} streaks - Numbers to show a best streak of.
+ * @param {bool} ignore_dnf - Boolean to control if DNFs should be ignored.
+ * @param {bool} ignore_plus_two - Boolean to control if +2s should be ignored.
  * @returns {void}
  */
 function print_stats(
@@ -500,12 +495,13 @@ function print_stats(
     solve_nums,
     step,
     streaks,
+    ignore_dnf,
+    ignore_plus_two,
     ) {
     if (times === undefined || times.length <= 0) {
         console.warn('No solves found.');
         return;
     }
-
     // validate solve_nums and update times
     solve_nums = validate_solve_nums(times, solve_nums);
     times = times.slice(solve_nums, (times.length + 1));
@@ -521,8 +517,8 @@ function print_stats(
     let num_plus_two = 0;
     let total_time_solving = 0;
 
-    let best_time = times[0].getNum;
-    let worst_time = times[0].getNum;
+    let best_time = times[0].num;
+    let worst_time = times[0].num;
 
     // bins that split histogram:
     // starts at graph_min - step and end at graph_max + step
@@ -546,9 +542,22 @@ function print_stats(
 
     const numtimes = [];
     for (let index = 0; index < times.length; index += 1) {
-        const time = times[index];
+        // make copy of time
+        const time = times[index].copy();
         total += 1;
-        if (time.getPlusTwo) num_plus_two += 1;
+        // Handle ignore +2 and ignore DNF flags
+        if (ignore_dnf) {
+            time.dnf = false;
+        }
+
+        if (ignore_plus_two) {
+            if (time.plus_two) {
+                time.num -= 2;
+            }
+            time.plus_two = false;
+        }
+
+        if (time.plus_two) num_plus_two += 1;
 
         const average_keys = Object.keys(average_dict);
         for (let i = 0; i < average_keys.length; i += 1) {
@@ -556,16 +565,30 @@ function print_stats(
             if (index > (key - 1)) {
                 const sub_times = [];
                 for (let n = index - (key - 1); n < index + 1; n += 1) {
-                    sub_times.push(times[n]);
+                    const temp_time = times[n].copy();
+                    total += 1;
+                    // Handle ignore +2 and ignore DNF flags
+                    if (ignore_dnf) {
+                        temp_time.dnf = false;
+                    }
+
+                    if (ignore_plus_two) {
+                        if (temp_time.plus_two) {
+                            temp_time.num -= 2;
+                        }
+                        temp_time.plus_two = false;
+                    }
+
+                    sub_times.push(temp_time);
                 }
                 const avg = average_of_n(sub_times);
-                if (!avg.getDNF) {
+                if (!avg.dnf) {
                     average_dict[key].push(avg);
                 }
             }
         }
 
-        const num = time.getNum;
+        const num = time.num;
         if (Number.isNaN(num)) {
             // should never be true--but if it were it would mess stuff up
             console.error(`Solve ${index} was NaN.`);
@@ -573,7 +596,7 @@ function print_stats(
         }
         total_time_solving += num;
 
-        if (time.getDNF) {
+        if (time.dnf) {
             num_dnf += 1;
 
             // streak counting
@@ -707,12 +730,12 @@ function print_stats(
         const avg_times = average_dict[key];
         if (avg_times.length <= 0) continue;
         // sort by value
-        avg_times.sort((a, b) => a.getTime - b.getTime);
+        avg_times.sort((a, b) => a.time - b.time);
 
         const best_avg = avg_times[0];
-        const best = best_avg.getTime.toFixed(2);
+        const best = best_avg.time.toFixed(2);
         const worst_avg = avg_times[avg_times.length - 1];
-        const worst = worst_avg.getTime.toFixed(2);
+        const worst = worst_avg.time.toFixed(2);
         // show best, worst avg in html (I.E., Best Average of {KEY} = Best)
         const best_parent = add_to_parent(avg_div, '', 'remove-refresh');
         add_to_parent(best_parent, 'Best', 'remove-refresh green one-line');
@@ -787,6 +810,8 @@ function draw_screen(time_input) {
     const step = step_input.value;
     const average_list = average_input.value.split(', ');
     const streak_list = streak_input.value.split(', ');
+    const ignore_dnf = ignore_dnf_input.checked;
+    const ignore_plus_two = ignore_plus_two_input.checked;
     print_stats(
         time_input,
         average_list,
@@ -795,11 +820,14 @@ function draw_screen(time_input) {
         solve_nums,
         step,
         streak_list,
+        ignore_dnf,
+        ignore_plus_two,
         );
 }
 
 function main() {
     let time_input;
+
     // draw screen with specific input method
     file_input_div.addEventListener('change', () => {
         const reader = new FileReader();
@@ -827,6 +855,8 @@ function main() {
     step_input.addEventListener('input', () => draw_screen(time_input));
     average_input.addEventListener('input', () => draw_screen(time_input));
     streak_input.addEventListener('input', () => draw_screen(time_input));
+    ignore_dnf_input.addEventListener('input', () => draw_screen(time_input));
+    ignore_plus_two_input.addEventListener('input', () => draw_screen(time_input));
 }
 
 main();
