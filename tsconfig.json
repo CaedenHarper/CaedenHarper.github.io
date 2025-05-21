@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "outDir": "./built",
+    "allowJs": false,
+    "target": "ES2021",
+    "lib": [
+        "ES2021",
+        "dom"
+    ],
+    "moduleDetection": "force",
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "isolatedModules": true
+  },    
+  "include": ["./src/**/*", "./tests/**/*"],
+  "exclude": ["./dist/**/*", "./eslint.config.mjs"],
+  "strict": true
+}
