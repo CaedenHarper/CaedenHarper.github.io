@@ -7,17 +7,25 @@
     "build-dev": "parcel build ./src/index.html --no-optimize --public-url ./",
     "prebuild": "shx rm -rf dist/*",
     "build": "parcel build ./src/index.html --public-url ./",
-    "push-gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup --verbose"
+    "push-gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup --verbose",
+    "test": "jest"
   },
   "devDependencies": {
-    "eslint": "^8.50.0",
-    "eslint-config-airbnb-base": "^15.0.0",
+    "@eslint/js": "^9.27.0",
+    "@stylistic/eslint-plugin": "^4.2.0",
+    "@types/jest": "^29.5.14",
+    "eslint": "^9.27.0",
     "eslint-plugin-import": "^2.28.1",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "parcel": "latest",
     "process": "^0.11.10",
-    "shx": "^0.3.2"
+    "shx": "^0.3.2",
+    "ts-jest": "^29.3.4",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "chart.js": "^4.0.0"
+    "chart.js": "^4.0.0",
+    "typescript-eslint": "^8.32.1"
   }
 }

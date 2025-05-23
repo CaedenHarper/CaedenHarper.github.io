@@ -1,38 +1,42 @@
 // initialize constants
 // divs
 // const main_div = document.getElementById('main_div');
-const timer_div = document.getElementById('timer');
-const date_div = document.getElementById('date');
-const paycheck_div = document.getElementById('paycheck');
-const biweekly_budget_div = document.getElementById('biweekly-budget');
-const daily_budget_div = document.getElementById('daily-budget');
-const miata_cost_div = document.getElementById('miata-cost');
-const tax_rate_div = document.getElementById('tax-rate');
-const already_saved_div = document.getElementById('already-saved');
-const total_cost_div = document.getElementById('total-cost');
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- We can be pretty sure it won't be null here.
+const timer_div = document.getElementById('timer')!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- We can be pretty sure it won't be null here.
+const date_div = document.getElementById('date')!;
+// Cast to Input Elements
+const paycheck_div = document.getElementById('paycheck') as HTMLInputElement;
+const biweekly_budget_div = document.getElementById('biweekly-budget') as HTMLInputElement;
+const daily_budget_div = document.getElementById('daily-budget') as HTMLInputElement;
+const miata_cost_div = document.getElementById('miata-cost') as HTMLInputElement;
+const tax_rate_div = document.getElementById('tax-rate') as HTMLInputElement;
+const already_saved_div = document.getElementById('already-saved') as HTMLInputElement;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- We can be pretty sure it won't be null here.
+const total_cost_div = document.getElementById('total-cost')!;
 
 // turn 'NaN', 'Infinity', '-Infinity', <any negative numbers>, -> '?'
-function parseInvalidValues(str) {
+function parseInvalidValues(str: string): string {
     const float_representation = parseFloat(str);
     return Number.isFinite(float_representation) && float_representation >= 0 ? str : '?';
 }
 
 // turn nothing in data boxes -> 0
-function parseInput(str) {
+function parseInput(str: string): number {
     const float_representation = parseFloat(str);
     return Number.isFinite(float_representation) ? float_representation : 0;
 }
 
-function parseDate(d) {
+function parseDate(d: number): string {
     const date = new Date(d);
-    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
     return date.toLocaleString('en-US', options);
 }
 
-function calculateCost() {
+function calculateCost(): number {
     const miata_cost = parseInput(miata_cost_div.value);
     const tax_rate = parseInput(tax_rate_div.value);
-    const full_cost = (miata_cost * (1 + tax_rate));
+    const full_cost = miata_cost * (1 + tax_rate);
 
     const already_saved = parseInput(already_saved_div.value);
     if (already_saved >= full_cost) {
@@ -41,7 +45,7 @@ function calculateCost() {
     return full_cost - already_saved;
 }
 
-function calculateTime(cost) {
+function calculateTime(cost: number): number {
     if (cost === 0) {
         return 0;
     }
@@ -58,24 +62,31 @@ function calculateTime(cost) {
     return cost / daily_paycheck;
 }
 
-function calculateDate(days) {
+function calculateDate(days: number): number {
     const today = new Date();
     return today.setDate(today.getDate() + days);
 }
 
-function update_biweekly_budget() {
-    biweekly_budget_div.value = (daily_budget_div.value * 14).toFixed(2);
+function update_biweekly_budget(): void {
+    const daily_budget = Number(daily_budget_div.value);
+    biweekly_budget_div.value = (daily_budget * 14).toFixed(2);
 }
 
-function update_daily_budget() {
-    daily_budget_div.value = (biweekly_budget_div.value / 14).toFixed(2);
+function update_daily_budget(): void {
+    const biweekly_budget = Number(biweekly_budget_div.value);
+    daily_budget_div.value = (biweekly_budget / 14).toFixed(2);
 }
 
-function toTwoDecimalPlaces(event) {
+function toTwoDecimalPlaces(_event: EventTarget | null): void {
+    if (_event === null) {
+        return;
+    }
+
+    const event = _event as HTMLInputElement;
     event.value = parseFloat(event.value).toFixed(2);
 }
 
-function draw_screen() {
+function draw_screen(): void {
     const total_cost = calculateCost();
     const total_days = calculateTime(total_cost);
     const total_date = calculateDate(total_days);
@@ -90,7 +101,7 @@ function draw_screen() {
     date_div.textContent = date;
 }
 
-function main() {
+function main(): void {
     // initialize textboxes with specified fixedness
     paycheck_div.value = parseFloat(paycheck_div.value).toFixed(2);
     biweekly_budget_div.value = parseFloat(biweekly_budget_div.value).toFixed(2);
