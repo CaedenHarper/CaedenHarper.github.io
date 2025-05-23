@@ -8,7 +8,7 @@
 ## About The Project
 This is a website built to visualize your CSTimer Rubiks Cube solves.  
 It has a best and worst average finder, best streak finder, and graphing feature.  
-It is built with pure Typescript, HTML, and CSS.
+It is built with pure Typescript, HTML, and CSS. Runs on Node v23.11.0.
 <!-- USAGE EXAMPLES -->
 ## Testing and Building
 To run tests, run `npm eslint .` and `npm test`  
