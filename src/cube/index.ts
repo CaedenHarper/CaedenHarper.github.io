@@ -370,8 +370,6 @@ export function average_of_n(times: CubeTime[], amount: number): Average {
     good_times.sort();
     // we want to skip the first values here because it is empty space
     const unused_in_array = amount - index;
-    console.table(good_times);
-    console.log(unused_in_array);
 
     // NOTE: Faster than of-loop and faster than .splice()
     // Sum over all values that are not in the top trim or bottom trim
