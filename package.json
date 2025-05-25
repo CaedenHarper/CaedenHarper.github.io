@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "chart.js": "^4.0.0",
+    "push-dir": "^0.4.1",
     "typescript-eslint": "^8.32.1"
   }
 }
