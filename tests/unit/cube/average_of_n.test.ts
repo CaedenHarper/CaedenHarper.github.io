@@ -1,3 +1,4 @@
+/* eslint-disable @stylistic/array-bracket-newline */
 /* eslint-disable @stylistic/array-element-newline */
 /* eslint-disable @stylistic/function-paren-newline */
 import { average_of_n, Average, CubeTime } from '../../../src/cube/index.ts';
@@ -10,8 +11,8 @@ const time_good = new CubeTime(1, false, false);
 const time_dnf = new CubeTime(1, false, true);
 
 // helper functions to create cubetime with less syntax
-function time(num: number): CubeTime {
-    return new CubeTime(num, false, false);
+function time(num: number, plus_two?: boolean, dnf?: boolean): CubeTime {
+    return new CubeTime(num, plus_two ?? false, dnf ?? false);
 }
 
 function times(nums: number[]): CubeTime[] {
@@ -164,6 +165,123 @@ test('regular average tests', () => {
 
     for (const [input, output] of cases) {
         const cubetimes = times(input[0]);
+        expect(average_of_n(cubetimes, input[1])).toHaveProperty('time', output);
+    }
+});
+
+// This returns 13.00 because ...
+test('ao100 edge case', () => {
+    const cases = new Map<[CubeTime[], number], number>(
+        [
+            [
+                [[time(14.43),
+                    time(13.32),
+                    time(12.55),
+                    time(11.77),
+                    time(13.26),
+                    time(11.76),
+                    time(9.71),
+                    time(13.57),
+                    time(11.36),
+                    time(12.35),
+                    time(11.00),
+                    time(11.47),
+                    time(12.02),
+                    time(10.87),
+                    time(12.55),
+                    time(11.52),
+                    time(12.13),
+                    time(11.74),
+                    time(13.63),
+                    time(16.79),
+                    time(15.20, true),
+                    time(11.14),
+                    time(13.85),
+                    time(11.48),
+                    time(13.19),
+                    time(13.73),
+                    time(15.77),
+                    time(14.20),
+                    time(16.80),
+                    time(12.72),
+                    time(16.09),
+                    time(14.35),
+                    time(16.80, true),
+                    time(11.22),
+                    time(16.84),
+                    time(11.56),
+                    time(13.55),
+                    time(10.78),
+                    time(22.63),
+                    time(13.35),
+                    time(13.09),
+                    time(16.67, true),
+                    time(13.81),
+                    time(11.16),
+                    time(12.68),
+                    time(12.09),
+                    time(11.55),
+                    time(11.83),
+                    time(10.10),
+                    time(10.77),
+                    time(12.20),
+                    time(12.22),
+                    time(12.10),
+                    time(11.62),
+                    time(10.40),
+                    time(12.85),
+                    time(12.76),
+                    time(11.50),
+                    time(13.53),
+                    time(14.30),
+                    time(11.13),
+                    time(11.89),
+                    time(12.71),
+                    time(14.34, false, true),
+                    time(12.85),
+                    time(10.34),
+                    time(14.79),
+                    time(14.05),
+                    time(11.58),
+                    time(16.27),
+                    time(11.98),
+                    time(16.07),
+                    time(11.48),
+                    time(14.28),
+                    time(10.40),
+                    time(10.44),
+                    time(15.71),
+                    time(12.84),
+                    time(12.68),
+                    time(12.20),
+                    time(14.96),
+                    time(13.37),
+                    time(11.62),
+                    time(13.05),
+                    time(10.48),
+                    time(13.38),
+                    time(13.34),
+                    time(12.36),
+                    time(11.94),
+                    time(12.24),
+                    time(11.08),
+                    time(14.97),
+                    time(18.38),
+                    time(15.80),
+                    time(11.55),
+                    time(10.63),
+                    time(13.16),
+                    time(10.55),
+                    time(13.48),
+                    time(15.63),
+                ], 100,
+                ],
+                12.89],
+        ],
+    );
+
+    for (const [input, output] of cases) {
+        const cubetimes = input[0];
         expect(average_of_n(cubetimes, input[1])).toHaveProperty('time', output);
     }
 });

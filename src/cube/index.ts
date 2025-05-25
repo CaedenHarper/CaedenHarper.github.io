@@ -350,6 +350,7 @@ export function average_of_n(times: CubeTime[], amount: number): Average {
     let bottom_trim = num_trim;
 
     // TypedArray is much faster than normal array
+    // Max value of elements is the amount in the array
     const good_times = new Float32Array(amount);
     let index = 0;
     for (const time of times) {
@@ -367,13 +368,17 @@ export function average_of_n(times: CubeTime[], amount: number): Average {
 
     // sort by value
     good_times.sort();
+    // we want to skip the first values here because it is empty space
+    const unused_in_array = amount - index;
+    console.table(good_times);
+    console.log(unused_in_array);
 
     // NOTE: Faster than of-loop and faster than .splice()
     // Sum over all values that are not in the top trim or bottom trim
     let sum = 0;
     // Start at num_trim to skip first too-good values
     // End bottom_trim early so we can skip too-bad values
-    for (index = num_trim; index < good_times.length - bottom_trim; index += 1) {
+    for (index = num_trim + unused_in_array; index < good_times.length - bottom_trim; index += 1) {
         sum += good_times[index];
     }
 
