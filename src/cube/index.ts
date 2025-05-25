@@ -84,6 +84,8 @@ export class CubeTime {
     toString(): string {
         // TODO: This only works for ss.ss right now
         // implement logic to handle minutes and hours too
+        // TODO: note .toFixed() is probably unnecessary and .toString() should work,
+        // but lets not make the change until unit tests
         let out = this.num.toFixed(2);
 
         if (this.plus_two) out += ' (+2)';
@@ -316,8 +318,8 @@ export function times_to_time_nums(times: CubeTime[]): number[] {
     return time_nums;
 }
 
-// TODO: refactor; increase speed
-// TODO: implement cache
+// TODO: increase speed more -- maybe with heaps?
+
 /**
  * Calculates average of n solves from given list with length n.
  *
@@ -327,13 +329,11 @@ export function times_to_time_nums(times: CubeTime[]): number[] {
  */
 export function average_of_n(times: CubeTime[], amount: number): Average {
     // copy for average solves parameter
-    const times_copy = [...times];
-    const dnf_average = new Average(amount, 0, true, times_copy);
-
     // Not big enough for average
     if (amount <= 2) {
         console.warn(`Amount ${amount} is not big enough to calculate average.`);
-        return dnf_average;
+        // Return DNF average
+        return new Average(0, 0, true, []);
     }
 
     // Validate we have correct amount of solves
@@ -345,41 +345,41 @@ export function average_of_n(times: CubeTime[], amount: number): Average {
     const trim_factor = 0.05;
     const num_trim = Math.ceil(trim_factor * amount);
 
-    let num_dnfs = 0;
-    const DNFs: number[] = [];
-    const times_to_remove: CubeTime[] = [];
+    // keep track of times to trim from the bottom / top
+    // so we can avoid re-doing calculations with DNFs
+    let bottom_trim = num_trim;
+
+    // TypedArray is much faster than normal array
+    const good_times = new Float32Array(amount);
+    let index = 0;
     for (const time of times) {
+        // On DNF we adjust bottom_trim
         if (time.dnf) {
-            num_dnfs += 1;
-            DNFs.push(time.num);
-            times_to_remove.push(time);
+            bottom_trim -= 1;
+            // return early if we have a DNF average
+            if (bottom_trim < 0) return new Average(0, 0, true, []);
+            continue;
         }
+        // Otherwise continue as normal
+        good_times[index] = time.num;
+        index += 1;
     }
 
-    if (num_dnfs > num_trim) {
-        return dnf_average;
-    }
-
-    for (const time_to_remove of times_to_remove) {
-        const index_to_remove = times.indexOf(time_to_remove);
-        if (index_to_remove !== -1) {
-            times.splice(index_to_remove, 1);
-        }
-    }
-
-    let time_nums = times_to_time_nums(times);
     // sort by value
-    time_nums.sort((a, b) => a - b);
-    // add DNFs and remove top trim_factor percent
-    time_nums = time_nums.concat(DNFs);
-    time_nums = time_nums.splice(num_trim);
-    time_nums = time_nums.splice(0, time_nums.length - num_trim);
+    good_times.sort();
 
-    const sum = time_nums.reduce((partialSum, a) => partialSum + a, 0);
+    // NOTE: Faster than of-loop and faster than .splice()
+    // Sum over all values that are not in the top trim or bottom trim
+    let sum = 0;
+    // Start at num_trim to skip first too-good values
+    // End bottom_trim early so we can skip too-bad values
+    for (index = num_trim; index < good_times.length - bottom_trim; index += 1) {
+        sum += good_times[index];
+    }
 
     const time = truncate_to_two_decimal_places(sum / (amount - 2 * num_trim));
 
-    return new Average(amount, time, false, times_copy);
+    return new Average(amount, time, false, times);
 }
 
 /**
@@ -421,7 +421,7 @@ export function keep_n_solves_from_times(solve_nums: number, times: CubeTime[]):
  * E.g., [5, 12] -> {5: [Average(length 5), ...], 12: [Average(length 12), ...]}
  * @param average_list Numbers to calculate "average of n" for.
  */
-function validate_average_list(average_list: number[]): Map<number, Average[]> {
+export function validate_average_list(average_list: number[]): Map<number, Average[]> {
     // default value
     if (average_list.length < 1) average_list = [5, 12];
 
@@ -583,7 +583,7 @@ function off_hover(event: MouseEvent, tooltip_div: HTMLElement): void {
  * @param ignore_dnf - Boolean to control if DNFs should be ignored.
  * @param ignore_plus_two - Boolean to control if +2s should be ignored.
  */
-function print_stats(
+export function print_stats(
     times: CubeTime[],
     average_list: number[],
     graph_min: number,
@@ -767,6 +767,9 @@ function print_stats(
 
     // show total in html
     total_div.textContent = `Total solves: ${total}`;
+
+    // TODO: all of these .toFixed() should be replace dwith .toString()
+    // (do after unit testing) CubeTime()
 
     // show best time in html
     add_to_parent(best_time_div, 'Best', 'remove-refresh one-line green');

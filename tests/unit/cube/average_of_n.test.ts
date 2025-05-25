@@ -1,9 +1,13 @@
+/* eslint-disable @stylistic/array-element-newline */
 /* eslint-disable @stylistic/function-paren-newline */
 import { average_of_n, Average, CubeTime } from '../../../src/cube/index.ts';
 
 // type TestCase = Map<[CubeTime[], number], Average>;
 type DNFCase = Map<[number[], number], boolean>;
 type TimeCase = Map<[number[], number], number>;
+
+const time_good = new CubeTime(1, false, false);
+const time_dnf = new CubeTime(1, false, true);
 
 // helper functions to create cubetime with less syntax
 function time(num: number): CubeTime {
@@ -22,6 +26,106 @@ function times(nums: number[]): CubeTime[] {
 
 test('empty input', () => {
     expect(average_of_n([], 0)).toHaveProperty('dnf', true);
+});
+
+test('ao5 Expected DNF average', () => {
+    expect(average_of_n([
+        time_dnf,
+        time_dnf,
+        time_good,
+        time_good,
+        time_good,
+    ], 5)).toHaveProperty('dnf', true);
+});
+
+test('ao5 Close but not DNF average', () => {
+    expect(average_of_n([
+        time_dnf,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+    ], 5)).toHaveProperty('dnf', false);
+});
+
+test('ao12 Expected DNF average', () => {
+    expect(average_of_n([
+        time_dnf,
+        time_dnf,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+    ], 12)).toHaveProperty('dnf', true);
+});
+
+test('ao12 Close but not DNF average', () => {
+    expect(average_of_n([
+        time_dnf,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+        time_good,
+    ], 12)).toHaveProperty('dnf', false);
+});
+
+test('ao100 Expected DNF average', () => {
+    expect(average_of_n([
+        // 6 DNFs
+        time_dnf, time_dnf, time_dnf, time_dnf, time_dnf, time_dnf,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good,
+    ], 100)).toHaveProperty('dnf', true);
+});
+
+test('ao100 Close but not DNF average', () => {
+    expect(average_of_n([
+        // 5 DNFs
+        time_dnf, time_dnf, time_dnf, time_dnf, time_dnf,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good, time_good,
+        time_good, time_good, time_good, time_good, time_good,
+    ], 100)).toHaveProperty('dnf', false);
 });
 
 // Check to see if average.dnf === true
