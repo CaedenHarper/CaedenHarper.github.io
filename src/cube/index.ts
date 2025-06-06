@@ -135,6 +135,55 @@ export class Average {
 }
 
 /**
+ * Timing statistics.
+ */
+class Stats {
+    num_solves: number;
+    best_time: number;
+    worst_time: number;
+    num_plus_two: number;
+    num_dnf: number;
+    total_time_solving: number;
+    average_dict: Map<number, Average[]>;
+    streak_dict: Map<number, [number, number]>;
+    graph_data: { time: number; count: number }[];
+
+    /**
+     * Populate divs with information
+     * @param num_solves How many solves
+     * @param best_time The best solve time
+     * @param worst_time The worst solve time
+     * @param num_plus_two How many +2s
+     * @param num_dnf How many DNFs
+     * @param total_time_solving Sum of all solve times
+     * @param average_dict TODO
+     * @param streak_dict TODO
+     * @param graph_data TODO
+     */
+    constructor (
+        num_solves: number,
+        best_time: number,
+        worst_time: number,
+        num_plus_two: number,
+        num_dnf: number,
+        total_time_solving: number,
+        average_dict: Map<number, Average[]>,
+        streak_dict: Map<number, [number, number]>,
+        graph_data: { time: number; count: number }[],
+    ) {
+        this.num_solves = num_solves;
+        this.best_time = best_time;
+        this.worst_time = worst_time;
+        this.num_plus_two = num_plus_two;
+        this.num_dnf = num_dnf;
+        this.total_time_solving = total_time_solving;
+        this.average_dict = average_dict;
+        this.streak_dict = streak_dict;
+        this.graph_data = graph_data;
+    }
+}
+
+/**
  * Truncate a number to two decimal places. Do not round.
  *
  * This method uses string casting to avoid floating point math errors.
@@ -576,17 +625,18 @@ function off_hover(event: MouseEvent, tooltip_div: HTMLElement): void {
 // TODO: refactor! into many functions. also maybe unit tests here too?
 /**
  * Print statistics onto the screen.
- * @param times - Solve times to process.
- * @param average_list - Averages to calculate average of n for.
- * @param graph_min - Positive integer that is the minimum point of graph.
- * @param graph_max - Positive integer that is the maximum point of graph.
- * @param solve_nums - Positive integer of solves to include.
- * @param step - Positive integer of distance between each point in time spread.
- * @param streaks - Numbers to show a best streak of.
- * @param ignore_dnf - Boolean to control if DNFs should be ignored.
- * @param ignore_plus_two - Boolean to control if +2s should be ignored.
+ * @param times Solve times to process.
+ * @param average_list Averages to calculate average of n for.
+ * @param graph_min Positive integer that is the minimum point of graph.
+ * @param graph_max Positive integer that is the maximum point of graph.
+ * @param solve_nums Positive integer of solves to include.
+ * @param step Positive integer of distance between each point in time spread.
+ * @param streaks Numbers to show a best streak of.
+ * @param ignore_dnf Boolean to control if DNFs should be ignored.
+ * @param ignore_plus_two Boolean to control if +2s should be ignored.
+ * @returns Statistics object on success, undefined on error.
  */
-export function print_stats(
+export function compute_stats(
     times: CubeTime[],
     average_list: number[],
     graph_min: number,
@@ -596,7 +646,7 @@ export function print_stats(
     streaks: number[],
     ignore_dnf: boolean,
     ignore_plus_two: boolean,
-): void {
+): Stats | undefined {
     if (times.length < 1) {
         console.warn('No solves found. Aborting.');
         return;
@@ -727,11 +777,7 @@ export function print_stats(
         return;
     }
 
-    // TODO: unit tests here
-
-    populate_graph(graph_data);
-
-    populate_divs(
+    return new Stats(
         num_solves,
         best_time,
         worst_time,
@@ -740,62 +786,48 @@ export function print_stats(
         total_time_solving,
         average_dict,
         streak_dict,
+        graph_data,
     );
 }
 
 // TODO: make average_dict a class, same with streak and streak_dict
+// TODO: unit tests
 
 /**
- * Populate divs with information
- * @param num_solves How many solves
- * @param best_time The best solve time
- * @param worst_time The worst solve time
- * @param num_plus_two How many +2s
- * @param num_dnf How many DNFs
- * @param total_time_solving Sum of all solve times
- * @param average_dict
- * @param streak_dict
+ * Populate divs with information from statistics object.
+ * @param stats Statistics object with timing information.
  */
-function populate_divs(
-    num_solves: number,
-    best_time: number,
-    worst_time: number,
-    num_plus_two: number,
-    num_dnf: number,
-    total_time_solving: number,
-    average_dict: Map<number, Average[]>,
-    streak_dict: Map<number, [number, number]>,
-): void {
+function populate_divs(stats: Stats): void {
     // show total in html
-    total_div.textContent = `Total solves: ${num_solves}`;
+    total_div.textContent = `Total solves: ${stats.num_solves}`;
 
     // show best time in html
     add_to_parent(best_time_div, 'Best', 'remove-refresh one-line green');
     add_to_parent(best_time_div, `${space}time:${space}`, 'remove-refresh one-line');
-    add_to_parent(best_time_div, best_time.toString(), 'remove-refresh one-line');
+    add_to_parent(best_time_div, stats.best_time.toString(), 'remove-refresh one-line');
 
     // show worst time in html
     add_to_parent(worst_time_div, 'Worst', 'remove-refresh one-line red');
     add_to_parent(worst_time_div, `${space}time:${space}`, 'remove-refresh one-line');
-    add_to_parent(worst_time_div, worst_time.toString(), 'remove-refresh one-line');
+    add_to_parent(worst_time_div, stats.worst_time.toString(), 'remove-refresh one-line');
 
     // show mean time in html
-    const mean_time = total_time_solving / (num_solves - num_dnf);
+    const mean_time = stats.total_time_solving / (stats.num_solves - stats.num_dnf);
     mean_div.textContent = `Mean: ${truncate_to_two_decimal_places(mean_time)}`;
 
     // show DNF count in html
     // dnf_div.textContent = `DNFs: ${num_dnf}`;
     add_to_parent(dnf_div, 'DNFs', 'remove-refresh one-line red');
     add_to_parent(dnf_div, `:${space}`, 'remove-refresh one-line');
-    add_to_parent(dnf_div, `${num_dnf}`, 'remove-refresh one-line');
+    add_to_parent(dnf_div, `${stats.num_dnf}`, 'remove-refresh one-line');
 
     // show +2 count in html
     add_to_parent(plus_two_div, '+2s', 'remove-refresh one-line red');
     add_to_parent(plus_two_div, `:${space}`, 'remove-refresh one-line');
-    add_to_parent(plus_two_div, `${num_plus_two}`, 'remove-refresh one-line');
+    add_to_parent(plus_two_div, `${stats.num_plus_two}`, 'remove-refresh one-line');
 
     // construct averages
-    for (const [key, avg_times] of average_dict) {
+    for (const [key, avg_times] of stats.average_dict) {
         if (avg_times.length <= 0) continue;
         // sort by value
         avg_times.sort((a, b) => a.time - b.time);
@@ -830,7 +862,7 @@ function populate_divs(
 
     // show streaks in html
     // sort streak dict by key
-    const sorted_streak_dict = new Map([...streak_dict].sort((a, b) => a[0] - b[0]));
+    const sorted_streak_dict = new Map([...stats.streak_dict].sort((a, b) => a[0] - b[0]));
     for (const [streak, streak_list] of sorted_streak_dict) {
         const cur_streak = streak_list[0];
         let best_streak = streak_list[1];
@@ -842,12 +874,13 @@ function populate_divs(
     }
 
     // show total time solving in html
-    const text = total_time_solving_text(total_time_solving);
+    const text = total_time_solving_text(stats.total_time_solving);
     total_time_div.textContent = `Total time: ${text}`;
 }
 
 // TODO: create class for graph data
 // not even sure what the graph data is specifically
+// TODO: unit test
 
 /**
  * Populate graph with graph data
@@ -910,6 +943,8 @@ function clear_divs(): void {
     if (chart) chart.destroy();
 }
 
+// TODO: unit tests here
+
 /**
 * Remove all whitespace from string and split on commas. Turn into an array of unique numbers. Non-numbers will be removed. An empty array may be returned.
 * @param str
@@ -936,6 +971,7 @@ function string_to_number_array(str: string): number[] {
 function draw_screen(time_input: CubeTime[]): void {
     clear_divs();
 
+    // TODO: consider moving to function
     const graph_min_string = min_input.value;
     const graph_max_string = max_input.value;
     const solve_nums_string = numsolves_input.value;
@@ -957,7 +993,7 @@ function draw_screen(time_input: CubeTime[]): void {
 
     // TODO: consider turning print_stats into create_stats,
     // and moving out the actual on-screen printing out of the function
-    print_stats(
+    const stats = compute_stats(
         time_input,
         average_list,
         graph_min,
@@ -968,6 +1004,11 @@ function draw_screen(time_input: CubeTime[]): void {
         ignore_dnf,
         ignore_plus_two,
     );
+
+    if (stats === undefined) return;
+
+    populate_graph(stats.graph_data);
+    populate_divs(stats);
 }
 
 function main(): void {
