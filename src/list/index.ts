@@ -2,7 +2,8 @@
 
 const unchecked_box = String.fromCodePoint(9744);
 const checked_box = String.fromCodePoint(9745);
-const main_div = document.getElementById('main_div');
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const main_div = document.getElementById('main_div')!;
 const id_list = [
     'airfryer',
     'pebble ice machine',
@@ -36,7 +37,7 @@ function append_to_div(id_name: string): void {
     div.className = 'noselect child shadow';
     div.textContent = `${unchecked_box} ${id_name}`;
     div.addEventListener('click', () => check_by_id(id_name));
-    main_div?.appendChild(div);
+    main_div.appendChild(div);
 }
 
 id_list.forEach(append_to_div);

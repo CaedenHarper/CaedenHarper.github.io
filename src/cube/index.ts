@@ -610,7 +610,7 @@ export function print_stats(
     step = validate_step(step);
     const streak_dict = validate_streaks(streaks);
 
-    let total = 0;
+    let num_solves = 0;
     let num_dnf = 0;
     let num_plus_two = 0;
     let total_time_solving = 0;
@@ -640,16 +640,14 @@ export function print_stats(
     for (let index = 0; index < times.length; index += 1) {
         // make copy of time
         const time = times[index].copy();
-        total += 1;
+        num_solves += 1;
         // Handle ignore +2 and ignore DNF flags
         if (ignore_dnf) {
             time.dnf = false;
         }
 
-        if (ignore_plus_two) {
-            if (time.plus_two) {
-                time.num -= 2;
-            }
+        if (ignore_plus_two && time.plus_two) {
+            time.num -= 2;
             time.plus_two = false;
         }
 
@@ -724,69 +722,66 @@ export function print_stats(
         numtimes.push(num);
     }
 
-    if (total < 1) {
+    if (num_solves < 1) {
         console.warn('No solves found. Aborting.');
         return;
     }
 
-    // TODO: definitely move this into a function
-    // TODO: make chart clearly show the min and max for each bucket
-    // (right now it is ambiguous)
-    const chart = Chart.getChart('graph');
-    const graph = document.getElementById('graph');
+    // TODO: unit tests here
 
-    if (chart) chart.destroy();
+    populate_graph(graph_data);
 
-    // remove 0 count datasets at the front
-    graph_data.pop();
-    if (graph_data.length > 0) {
-        new Chart(
-            // TODO: should we validate the typecasting here?
-            graph as ChartItem,
-            {
-                type: 'bar',
-                options: {
-                    plugins: {
-                        legend: {
-                            display: false,
-                        },
-                    },
-                },
-                data: {
-                    labels: graph_data.map((row) => row.time),
-                    datasets: [
-                        {
-                            backgroundColor: blue,
-                            label: 'Solves',
-                            data: graph_data.map((row) => row.count),
-                        },
-                    ],
-                },
-            },
-        );
-    }
+    populate_divs(
+        num_solves,
+        best_time,
+        worst_time,
+        num_plus_two,
+        num_dnf,
+        total_time_solving,
+        average_dict,
+        streak_dict,
+    );
+}
 
-    // TODO: move to function and unit test
+// TODO: make average_dict a class, same with streak and streak_dict
 
+/**
+ * Populate divs with information
+ * @param num_solves How many solves
+ * @param best_time The best solve time
+ * @param worst_time The worst solve time
+ * @param num_plus_two How many +2s
+ * @param num_dnf How many DNFs
+ * @param total_time_solving Sum of all solve times
+ * @param average_dict
+ * @param streak_dict
+ */
+function populate_divs(
+    num_solves: number,
+    best_time: number,
+    worst_time: number,
+    num_plus_two: number,
+    num_dnf: number,
+    total_time_solving: number,
+    average_dict: Map<number, Average[]>,
+    streak_dict: Map<number, [number, number]>,
+): void {
     // show total in html
-    total_div.textContent = `Total solves: ${total}`;
-
-    // TODO: all of these .toFixed() should be replace dwith .toString()
-    // (do after unit testing) CubeTime()
+    total_div.textContent = `Total solves: ${num_solves}`;
 
     // show best time in html
     add_to_parent(best_time_div, 'Best', 'remove-refresh one-line green');
     add_to_parent(best_time_div, `${space}time:${space}`, 'remove-refresh one-line');
-    add_to_parent(best_time_div, best_time.toFixed(2), 'remove-refresh one-line');
+    add_to_parent(best_time_div, best_time.toString(), 'remove-refresh one-line');
 
     // show worst time in html
     add_to_parent(worst_time_div, 'Worst', 'remove-refresh one-line red');
     add_to_parent(worst_time_div, `${space}time:${space}`, 'remove-refresh one-line');
-    add_to_parent(worst_time_div, worst_time.toFixed(2), 'remove-refresh one-line');
+    add_to_parent(worst_time_div, worst_time.toString(), 'remove-refresh one-line');
 
     // show mean time in html
-    const mean_time = total_time_solving / (total - num_dnf);
-    mean_div.textContent = `Mean: ${mean_time.toFixed(2)}`;
+    const mean_time = total_time_solving / (num_solves - num_dnf);
+    mean_div.textContent = `Mean: ${truncate_to_two_decimal_places(mean_time)}`;
 
     // show DNF count in html
     // dnf_div.textContent = `DNFs: ${num_dnf}`;
@@ -851,7 +846,54 @@ export function print_stats(
     total_time_div.textContent = `Total time: ${text}`;
 }
 
-function clean_divs(): void {
+// TODO: create class for graph data
+// not even sure what the graph data is specifically
+
+/**
+ * Populate graph with graph data
+ */
+function populate_graph(graph_data: { time: number; count: number }[]): void {
+    // TODO: make chart clearly show the min and max for each bucket
+    // (right now it is ambiguous)
+    const chart = Chart.getChart('graph');
+    const graph = document.getElementById('graph');
+
+    if (chart) chart.destroy();
+
+    // remove 0 count datasets at the front
+    graph_data.pop();
+    if (graph_data.length > 0) {
+        new Chart(
+            // TODO: should we validate the typecasting here?
+            graph as ChartItem,
+            {
+                type: 'bar',
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false,
+                        },
+                    },
+                },
+                data: {
+                    labels: graph_data.map((row) => row.time),
+                    datasets: [
+                        {
+                            backgroundColor: blue,
+                            label: 'Solves',
+                            data: graph_data.map((row) => row.count),
+                        },
+                    ],
+                },
+            },
+        );
+    }
+}
+
+/**
+ * Clear text divs and remove all removeable divs.
+ */
+function clear_divs(): void {
     // clear text divs
     total_time_div.textContent = '';
     total_div.textContent = '';
@@ -865,7 +907,6 @@ function clean_divs(): void {
 
     // destroy graph
     const chart = Chart.getChart('graph');
-
     if (chart) chart.destroy();
 }
 
@@ -893,7 +934,7 @@ function string_to_number_array(str: string): number[] {
 }
 
 function draw_screen(time_input: CubeTime[]): void {
-    clean_divs();
+    clear_divs();
 
     const graph_min_string = min_input.value;
     const graph_max_string = max_input.value;
@@ -914,6 +955,8 @@ function draw_screen(time_input: CubeTime[]): void {
     const average_list = string_to_number_array(average_list_string);
     const streak_list = string_to_number_array(streak_list_string);
 
+    // TODO: consider turning print_stats into create_stats,
+    // and moving out the actual on-screen printing out of the function
     print_stats(
         time_input,
         average_list,
