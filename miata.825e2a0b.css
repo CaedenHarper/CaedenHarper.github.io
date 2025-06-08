@@ -1,0 +1,104 @@
+@media (width <= 1199px) {
+  div {
+    color: #fff;
+    font-size: 1.6em;
+  }
+
+  #main_div {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+  }
+
+  .noscroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    appearance: textfield;
+  }
+
+  input {
+    color: #8fcdf4;
+    background-color: #0d0404;
+    border: 0;
+    width: 4em;
+    height: 1em;
+    font-family: Times New Roman;
+    font-size: 1em;
+    font-weight: bold;
+  }
+
+  .one-line {
+    display: inline-block;
+  }
+
+  #timer, #date {
+    font-size: 3em;
+  }
+
+  #total-cost {
+    font-size: 1.25em;
+  }
+}
+
+@media (width >= 1200px) {
+  div {
+    color: #fff;
+    font-size: 2.5vw;
+  }
+
+  #main_div {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+  }
+
+  .noscroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    appearance: textfield;
+  }
+
+  input {
+    color: #8fcdf4;
+    background-color: #0d0404;
+    border: 0;
+    width: 12vw;
+    height: 4vh;
+    font-family: Times New Roman;
+    font-size: 2.5vw;
+    font-weight: bold;
+  }
+
+  .one-line {
+    display: inline-block;
+  }
+
+  #timer, #date {
+    font-size: 4vw;
+  }
+}
+/*# sourceMappingURL=miata.825e2a0b.css.map */

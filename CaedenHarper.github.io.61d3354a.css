@@ -1,0 +1,53 @@
+body {
+  background-color: #0d0404;
+}
+
+div {
+  color: #ff5bc6;
+  font-size: calc(4vw + 3.5vh);
+  font-weight: bold;
+}
+
+#main_div {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  margin: auto;
+  display: flex;
+  position: absolute;
+  inset: 0;
+}
+
+.delete {
+  color: #0000;
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 0;
+}
+
+a {
+  padding: 1.5vw;
+  text-decoration: none;
+}
+
+a:link, a:visited {
+  color: #0163b9;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+  color: #eca94b;
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  user-select: none;
+  -khtml-user-select: none;
+}
+/*# sourceMappingURL=CaedenHarper.github.io.61d3354a.css.map */

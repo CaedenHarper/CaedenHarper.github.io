@@ -1,0 +1,1 @@
+{"mappings":"ACGA;;;;AAIA","sources":["WxnUTq","src/timer/index.css"],"sourcesContent":[null,"/* import main style */\n@import \"../index.css\";\n\n.pay {\n    color: #a6e481\n}\n\n.grad {\n    color: #55b4c9\n}"],"names":[],"version":3,"file":"timer.294c0771.css.map","sourceRoot":"/__parcel_source_root/"}
