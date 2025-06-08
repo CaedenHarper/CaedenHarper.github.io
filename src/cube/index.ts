@@ -1,10 +1,6 @@
 import Chart, { ChartItem } from 'chart.js/auto';
 // FUTURE:
 // add line graph
-// TODO:
-// (kind of soon)
-// implement cache
-// increase speed
 // FIXME:
 // add e2e / perf testing
 // add much more logging
@@ -299,7 +295,6 @@ export function text_parse(solves: string): CubeTime[] {
     const lines = solves.split('\n');
     const times: CubeTime[] = [];
     for (const line of lines) {
-        // TODO: consider moving into a function and writing unit tests
         // Then we match lines starting with any amount of whitespace,
         // and any of the CSTimer generated strings (single, mean of 3, best, worst, etc.)
         const CSTIMER_LINE_REGEX = /^ *(Generated|solves|single|mean|avg|current|best|worst|Average|Mean).*$/;
