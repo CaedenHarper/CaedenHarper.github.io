@@ -133,7 +133,7 @@ export class Average {
 /**
  * Timing statistics.
  */
-class Stats {
+export class Stats {
     num_solves: number;
     best_time: number;
     worst_time: number;
@@ -674,11 +674,9 @@ export function compute_stats(
     const end = graph_max + step;
     // also construct graph data at the same time to avoid two loops
     const graph_data: { time: number; count: number }[] = [];
-    let graph_index = 0;
     while (value < end) {
         value += step;
-        graph_data[graph_index] = { time: truncate_to_two_decimal_places(value), count: 0 };
-        graph_index += 1;
+        graph_data.push({ time: truncate_to_two_decimal_places(value), count: 0 });
     }
 
     const numtimes: number[] = [];
@@ -717,39 +715,6 @@ export function compute_stats(
         }
         total_time_solving += num;
 
-        if (time.dnf) {
-            num_dnf += 1;
-
-            // streak counting
-            for (const [_streak, streak_list] of streak_dict) {
-                let cur_streak = streak_list[0];
-                let best_streak = streak_list[1];
-                if (cur_streak > best_streak) best_streak = cur_streak;
-                cur_streak = 0;
-                // update streak
-                streak_list[0] = cur_streak;
-                streak_list[1] = best_streak;
-            }
-            continue;
-        }
-
-        // TODO: what does this do?
-        // TODO: consider turning graph_data into a clearer object here / class
-        for (let i = 0; i < graph_data.length - 1; i += 1) {
-            const this_properties = graph_data[i];
-            const this_time = this_properties.time;
-            const next_properties = graph_data[i + 1];
-            const next_time = next_properties.time;
-            if (num < next_time && num >= this_time) {
-                this_properties.count += 1;
-            }
-        }
-
-        if (num < best_time) best_time = num;
-        if (num > worst_time) worst_time = num;
-
-        // TODO: combine the two streak counting loops into one? maybe?
-
         // streak counting
         for (const [streak, streak_list] of streak_dict) {
             let cur_streak = streak_list[0];
@@ -758,11 +723,31 @@ export function compute_stats(
             if (num < streak) cur_streak += 1;
             if (num >= streak) cur_streak = 0;
             if (cur_streak > best_streak) best_streak = cur_streak;
+            // Reset streak on DNF
+            if (time.dnf) cur_streak = 0;
 
             // update streak
             streak_list[0] = cur_streak;
             streak_list[1] = best_streak;
         }
+
+        if (time.dnf) {
+            num_dnf += 1;
+            continue;
+        }
+
+        // Check if time falls within graph data range
+        for (let i = 0; i < graph_data.length - 1; i += 1) {
+            const current_data = graph_data[i];
+            const next_data = graph_data[i + 1];
+
+            if (num < next_data.time && num >= current_data.time) {
+                current_data.count += 1;
+            }
+        }
+
+        if (num < best_time) best_time = num;
+        if (num > worst_time) worst_time = num;
 
         numtimes.push(num);
     }
@@ -986,8 +971,6 @@ function draw_screen(time_input: CubeTime[]): void {
     const average_list = string_to_number_array(average_list_string);
     const streak_list = string_to_number_array(streak_list_string);
 
-    // TODO: consider turning print_stats into create_stats,
-    // and moving out the actual on-screen printing out of the function
     const stats = compute_stats(
         time_input,
         average_list,
