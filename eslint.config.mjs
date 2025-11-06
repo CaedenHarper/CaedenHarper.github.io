@@ -39,6 +39,8 @@ export default tseslint.config(
             '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: true }],
             // Disable lines between class members checking
             '@stylistic/lines-between-class-members': 'off',
+            // 
+            '@stylistic/linebreak-style': ['error', 'windows'],
             // Require explicit function return types
             '@typescript-eslint/explicit-function-return-type': 'error',
             // Allow all template string auto stringification
