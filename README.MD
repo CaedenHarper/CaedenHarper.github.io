@@ -11,7 +11,7 @@ It has a best and worst average finder, best streak finder, and graphing feature
 It is built with pure Typescript, HTML, and CSS. Runs on Node v23.11.0.
 <!-- USAGE EXAMPLES -->
 ## Testing and Building
-To run tests, run `npm eslint .` and `npm test`  
+To run tests, run `npx eslint .` and `npm test`  
 Test locally with `npm run start`  
 Build with `npx parcel build`  
 Deploy with `git commit -am "message"` and `npm run push-gh-pages`
