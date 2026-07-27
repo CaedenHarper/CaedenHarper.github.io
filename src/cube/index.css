@@ -47,6 +47,10 @@ input {
     width: 4vw;
 }
 
+#date-input {
+    width: auto;
+}
+
 #file-input {
     width: auto;
     /* color: transparent; */

@@ -66,6 +66,7 @@ The defaults are 5 seconds minimum, 30 seconds maximum, and 1-second steps.
 The analyzer can be configured to:
 
 - Use only the most recent N solves from a session
+- Show only solves from a selected date when importing a timestamped CSV
 - Ignore DNFs
 - Ignore `+2` penalties
 
@@ -75,8 +76,9 @@ Leaving the solve-count field empty analyzes the full imported session.
 
 1. Open the analyzer in a browser.
 2. Paste csTimer output into the text box or upload a csTimer CSV export.
-3. Adjust graph, average, streak, solve-count, or penalty settings as needed.
-4. Review the calculated statistics and histogram.
+3. Optionally select a solve date after importing a timestamped CSV.
+4. Adjust graph, average, streak, solve-count, or penalty settings as needed.
+5. Review the calculated statistics and histogram.
 
 ## Development
 

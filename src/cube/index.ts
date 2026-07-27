@@ -30,6 +30,7 @@ const mean_div = document.getElementById('mean')!;
 const min_input = document.getElementById('min-input') as HTMLInputElement;
 const max_input = document.getElementById('max-input') as HTMLInputElement;
 const numsolves_input = document.getElementById('numsolves-input') as HTMLInputElement;
+const date_input = document.getElementById('date-input') as HTMLInputElement;
 const step_input = document.getElementById('step-input') as HTMLInputElement;
 const average_input = document.getElementById('average-input') as HTMLInputElement;
 const streak_input = document.getElementById('streak-input') as HTMLInputElement;
@@ -58,23 +59,26 @@ export class CubeTime {
     num: number;
     plus_two: boolean;
     dnf: boolean;
+    date?: string;
 
     /**
     * @param num - Time of the solve in seconds to two decimal places.
     * @param plus_two - If the solve was a plus two.
     * @param dnf - If the solve was a DNF.
+    * @param date - Optional solve date in YYYY-MM-DD format.
     */
-    constructor(num: number, plus_two: boolean, dnf: boolean) {
+    constructor(num: number, plus_two: boolean, dnf: boolean, date?: string) {
         this.num = truncate_to_two_decimal_places(num);
         this.plus_two = plus_two;
         this.dnf = dnf;
+        this.date = date;
     }
 
     /**
      * Make a copy of the CubeTime.
      */
     copy(): CubeTime {
-        return new CubeTime(this.num, this.plus_two, this.dnf);
+        return new CubeTime(this.num, this.plus_two, this.dnf, this.date);
     }
 
     toString(): string {
@@ -135,8 +139,8 @@ export class Average {
  */
 export class Stats {
     num_solves: number;
-    best_time: number | null;
-    worst_time: number | null;
+    best_time: number | undefined;
+    worst_time: number | undefined;
     num_plus_two: number;
     num_dnf: number;
     total_time_solving: number;
@@ -158,8 +162,8 @@ export class Stats {
      */
     constructor (
         num_solves: number,
-        best_time: number | null,
-        worst_time: number | null,
+        best_time: number | undefined,
+        worst_time: number | undefined,
         num_plus_two: number,
         num_dnf: number,
         total_time_solving: number,
@@ -322,7 +326,7 @@ export function text_parse(solves: string): CubeTime[] {
  * Parses a csv file containing a list of solves into an array of CubeTimes.
  * @param file_content - String resulting from file to parse
  */
-function csv_parse(file_content: string): CubeTime[] {
+export function csv_parse(file_content: string): CubeTime[] {
     const times: CubeTime[] = [];
 
     const lines = file_content.split('\n');
@@ -334,13 +338,17 @@ function csv_parse(file_content: string): CubeTime[] {
         const time = info[1];
         // const comment = info[2];
         // const scramble = info[3];
-        // const date = info[4];
+        const date_time = info[4]?.trim();
         // const p1 = info[5];
 
         const time_object = time_parse(time);
 
         if (time_object === undefined) {
             continue;
+        }
+
+        if ((/^\d{4}-\d{2}-\d{2}/).test(date_time)) {
+            time_object.date = date_time.slice(0, 10);
         }
 
         times.push(time_object);
@@ -427,6 +435,17 @@ export function average_of_n(times: CubeTime[], amount: number): Average {
     const time = truncate_to_two_decimal_places(sum / (amount - 2 * num_trim));
 
     return new Average(amount, time, false, times);
+}
+
+/**
+ * Return solves recorded on the selected date. An empty date disables filtering.
+ * @param times Solves to filter.
+ * @param selected_date Date in YYYY-MM-DD format.
+ */
+export function filter_times_by_date(times: CubeTime[], selected_date: string): CubeTime[] {
+    if (selected_date === '') return times.slice();
+
+    return times.filter((time) => time.date === selected_date);
 }
 
 /**
@@ -649,6 +668,19 @@ export function compute_stats(
     // update times by solve_nums
     times = keep_n_solves_from_times(solve_nums, times);
 
+    const adjusted_times = times.map((original_time) => {
+        const time = original_time.copy();
+
+        if (ignore_dnf) time.dnf = false;
+
+        if (ignore_plus_two && time.plus_two) {
+            time.num -= 2;
+            time.plus_two = false;
+        }
+
+        return time;
+    });
+
     // validate everything else
     const average_dict = validate_average_list(average_list);
     [graph_min, graph_max] = validate_graphs(graph_min, graph_max);
@@ -660,9 +692,8 @@ export function compute_stats(
     let num_plus_two = 0;
     let total_time_solving = 0;
 
-    // init as null to avoid first solve being a DNF
-    let best_time: number | null = null;
-    let worst_time: number | null = null;
+    let best_time: number | undefined;
+    let worst_time: number | undefined;
 
     // bins that split histogram:
     // starts at graph_min - step and end at graph_max + step
@@ -680,26 +711,9 @@ export function compute_stats(
         graph_data.push({ time: truncate_to_two_decimal_places(value), count: 0 });
     }
 
-    // adjust times based on dnf, plus_two settings
-    const adjusted_times = times.map((original_time) => {
-        const time = original_time.copy();
-
-        if (ignore_dnf) {
-            time.dnf = false;
-        }
-
-        if (ignore_plus_two && time.plus_two) {
-            time.num -= 2;
-            time.plus_two = false;
-        }
-
-        return time;
-    });
-
+    const numtimes: number[] = [];
     for (let index = 0; index < adjusted_times.length; index += 1) {
-        // make copy of time
-        const time = adjusted_times[index].copy();
-
+        const time = adjusted_times[index];
         num_solves += 1;
 
         if (time.plus_two) num_plus_two += 1;
@@ -753,8 +767,10 @@ export function compute_stats(
             }
         }
 
-        if (best_time == null || num < best_time) best_time = num;
-        if (worst_time == null || num > worst_time) worst_time = num;
+        if (best_time === undefined || num < best_time) best_time = num;
+        if (worst_time === undefined || num > worst_time) worst_time = num;
+
+        numtimes.push(num);
     }
 
     if (num_solves < 1) {
@@ -789,18 +805,21 @@ function populate_divs(stats: Stats): void {
     // show best time in html
     add_to_parent(best_time_div, 'Best', 'remove-refresh one-line green');
     add_to_parent(best_time_div, `${space}time:${space}`, 'remove-refresh one-line');
-    add_to_parent(best_time_div, stats.best_time?.toString() ?? 'n/a', 'remove-refresh one-line');
+    add_to_parent(best_time_div, stats.best_time?.toString() ?? 'N/A', 'remove-refresh one-line');
 
     // show worst time in html
     add_to_parent(worst_time_div, 'Worst', 'remove-refresh one-line red');
     add_to_parent(worst_time_div, `${space}time:${space}`, 'remove-refresh one-line');
-    add_to_parent(worst_time_div, stats.worst_time?.toString() ?? 'n/a', 'remove-refresh one-line');
+    add_to_parent(worst_time_div, stats.worst_time?.toString() ?? 'N/A', 'remove-refresh one-line');
 
     // show mean time in html
-    const mean_time = stats.total_time_solving / (stats.num_solves - stats.num_dnf);
-    let mean_time_str = 'n/a'; // might be infinity
-    if (isFinite(mean_time)) mean_time_str = truncate_to_two_decimal_places(mean_time).toString();
-    mean_div.textContent = `Mean: ${mean_time_str}`;
+    const valid_solves = stats.num_solves - stats.num_dnf;
+    if (valid_solves > 0) {
+        const mean_time = stats.total_time_solving / valid_solves;
+        mean_div.textContent = `Mean: ${truncate_to_two_decimal_places(mean_time)}`;
+    } else {
+        mean_div.textContent = 'Mean: N/A';
+    }
 
     // show DNF count in html
     // dnf_div.textContent = `DNFs: ${num_dnf}`;
@@ -962,6 +981,7 @@ function draw_screen(time_input: CubeTime[]): void {
     const graph_min_string = min_input.value;
     const graph_max_string = max_input.value;
     const solve_nums_string = numsolves_input.value;
+    const selected_date = date_input.value;
     const step_string = step_input.value;
     const average_list_string = average_input.value;
     const streak_list_string = streak_input.value;
@@ -978,8 +998,10 @@ function draw_screen(time_input: CubeTime[]): void {
     const average_list = string_to_number_array(average_list_string);
     const streak_list = string_to_number_array(streak_list_string);
 
+    const filtered_times = filter_times_by_date(time_input, selected_date);
+
     const stats = compute_stats(
-        time_input,
+        filtered_times,
         average_list,
         graph_min,
         graph_max,
@@ -990,7 +1012,10 @@ function draw_screen(time_input: CubeTime[]): void {
         ignore_plus_two,
     );
 
-    if (stats === undefined) return;
+    if (stats === undefined) {
+        if (selected_date !== '') total_div.textContent = `No solves found for ${selected_date}.`;
+        return;
+    }
 
     populate_graph(stats.graph_data);
     populate_divs(stats);
@@ -1013,12 +1038,16 @@ function main(): void {
             text_input_div.value = '';
             // FIXME: can we typecast here?
             time_input = csv_parse(reader.result as string);
+            date_input.disabled = !time_input.some((time) => time.date !== undefined);
+            if (date_input.disabled) date_input.value = '';
             draw_screen(time_input);
         };
     });
 
     text_input_div.addEventListener('input', () => {
         file_input_div.value = '';
+        date_input.value = '';
+        date_input.disabled = true;
         time_input = text_parse(text_input_div.value);
         draw_screen(time_input);
     });
@@ -1027,6 +1056,7 @@ function main(): void {
     min_input.addEventListener('input', () => draw_screen(time_input));
     max_input.addEventListener('input', () => draw_screen(time_input));
     numsolves_input.addEventListener('input', () => draw_screen(time_input));
+    date_input.addEventListener('input', () => draw_screen(time_input));
     step_input.addEventListener('input', () => draw_screen(time_input));
     average_input.addEventListener('input', () => draw_screen(time_input));
     streak_input.addEventListener('input', () => draw_screen(time_input));
