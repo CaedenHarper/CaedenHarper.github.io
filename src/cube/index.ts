@@ -14,6 +14,9 @@ const streak_div = document.getElementById('streak')!;
 const file_input_div = document.getElementById('file-input') as HTMLInputElement;
 const text_input_div = document.getElementById('text-input') as HTMLInputElement;
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- this is probably fine
+const sample_label_div = document.getElementById('sample-label')!;
+const selected_graph_box = document.getElementById('selected-graph-box') as HTMLDivElement;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- this is probably fine
 const total_time_div = document.getElementById('total_time')!;
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- this is probably fine
 const total_div = document.getElementById('total')!;
@@ -31,6 +34,9 @@ const min_input = document.getElementById('min-input') as HTMLInputElement;
 const max_input = document.getElementById('max-input') as HTMLInputElement;
 const numsolves_input = document.getElementById('numsolves-input') as HTMLInputElement;
 const date_input = document.getElementById('date-input') as HTMLInputElement;
+const previous_date_button = document.getElementById('previous-date-button') as HTMLButtonElement;
+const next_date_button = document.getElementById('next-date-button') as HTMLButtonElement;
+const clear_date_button = document.getElementById('clear-date-button') as HTMLButtonElement;
 const step_input = document.getElementById('step-input') as HTMLInputElement;
 const average_input = document.getElementById('average-input') as HTMLInputElement;
 const streak_input = document.getElementById('streak-input') as HTMLInputElement;
@@ -39,6 +45,7 @@ const ignore_plus_two_input = document.getElementById('ignore-plus-two-input') a
 
 // colors
 const blue = '#0163C3';
+const red = '#D81616';
 const white = '#FFFFFF';
 const black = '#000000';
 const light_blue = '#89CFF0';
@@ -446,6 +453,45 @@ export function filter_times_by_date(times: CubeTime[], selected_date: string): 
     if (selected_date === '') return times.slice();
 
     return times.filter((time) => time.date === selected_date);
+}
+
+/**
+ * Return the unique solve dates in chronological order.
+ * @param times Solves whose dates should be collected.
+ */
+export function get_solve_dates(times: CubeTime[]): string[] {
+    const dates = new Set<string>();
+
+    for (const time of times) {
+        if (time.date !== undefined) dates.add(time.date);
+    }
+
+    return [...dates].sort();
+}
+
+/**
+ * Find the previous or next date containing solves.
+ * @param dates Sorted solve dates in YYYY-MM-DD format.
+ * @param selected_date Currently selected date.
+ * @param direction -1 for the previous date, 1 for the next date.
+ */
+export function get_adjacent_solve_date(
+    dates: string[],
+    selected_date: string,
+    direction: -1 | 1,
+): string | undefined {
+    if (selected_date === '') return;
+
+    if (direction === -1) {
+        for (let index = dates.length - 1; index >= 0; index -= 1) {
+            if (dates[index] < selected_date) return dates[index];
+        }
+        return;
+    }
+
+    for (const date of dates) {
+        if (date > selected_date) return date;
+    }
 }
 
 /**
@@ -889,44 +935,61 @@ function populate_divs(stats: Stats): void {
 // TODO: unit test
 
 /**
- * Populate graph with graph data
+ * Populate one histogram.
+ * @param graph_id Canvas element ID.
+ * @param graph_data Histogram data to display.
+ * @param background_color Bar color.
+ * @param title Optional chart title.
  */
-function populate_graph(graph_data: { time: number; count: number }[]): void {
+function populate_graph(
+    graph_id: string,
+    graph_data: { time: number; count: number }[],
+    background_color: string,
+    title = '',
+): void {
     // TODO: make chart clearly show the min and max for each bucket
     // (right now it is ambiguous)
-    const chart = Chart.getChart('graph');
-    const graph = document.getElementById('graph');
+    const chart = Chart.getChart(graph_id);
+    const graph = document.getElementById(graph_id);
 
     if (chart) chart.destroy();
 
-    // remove 0 count datasets at the front
-    graph_data.pop();
-    if (graph_data.length > 0) {
-        new Chart(
-            // TODO: should we validate the typecasting here?
-            graph as ChartItem,
-            {
-                type: 'bar',
-                options: {
-                    plugins: {
-                        legend: {
-                            display: false,
+    // The final row is an upper boundary, not a displayed bucket.
+    const rows = graph_data.slice(0, -1);
+    if (graph === null || rows.length < 1) return;
+
+    new Chart(
+        graph as ChartItem,
+        {
+            type: 'bar',
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        color: background_color,
+                        display: title !== '',
+                        font: {
+                            size: 16,
                         },
+                        text: title,
                     },
                 },
-                data: {
-                    labels: graph_data.map((row) => row.time),
-                    datasets: [
-                        {
-                            backgroundColor: blue,
-                            label: 'Solves',
-                            data: graph_data.map((row) => row.count),
-                        },
-                    ],
-                },
             },
-        );
-    }
+            data: {
+                labels: rows.map((row) => row.time),
+                datasets: [
+                    {
+                        backgroundColor: background_color,
+                        label: title || 'Solves',
+                        data: rows.map((row) => row.count),
+                    },
+                ],
+            },
+        },
+    );
 }
 
 /**
@@ -934,6 +997,9 @@ function populate_graph(graph_data: { time: number; count: number }[]): void {
  */
 function clear_divs(): void {
     // clear text divs
+    sample_label_div.textContent = '';
+    sample_label_div.hidden = true;
+    sample_label_div.style.color = white;
     total_time_div.textContent = '';
     total_div.textContent = '';
     mean_div.textContent = '';
@@ -947,6 +1013,10 @@ function clear_divs(): void {
     // destroy graph
     const chart = Chart.getChart('graph');
     if (chart) chart.destroy();
+
+    const selected_chart = Chart.getChart('selected-date-graph');
+    if (selected_chart) selected_chart.destroy();
+    selected_graph_box.hidden = true;
 }
 
 // TODO: unit tests here
@@ -998,10 +1068,8 @@ function draw_screen(time_input: CubeTime[]): void {
     const average_list = string_to_number_array(average_list_string);
     const streak_list = string_to_number_array(streak_list_string);
 
-    const filtered_times = filter_times_by_date(time_input, selected_date);
-
-    const stats = compute_stats(
-        filtered_times,
+    const full_stats = compute_stats(
+        time_input,
         average_list,
         graph_min,
         graph_max,
@@ -1012,17 +1080,87 @@ function draw_screen(time_input: CubeTime[]): void {
         ignore_plus_two,
     );
 
-    if (stats === undefined) {
-        if (selected_date !== '') total_div.textContent = `No solves found for ${selected_date}.`;
+    if (full_stats === undefined) return;
+
+    if (selected_date === '') {
+        populate_graph('graph', full_stats.graph_data, blue);
+        populate_divs(full_stats);
         return;
     }
 
-    populate_graph(stats.graph_data);
-    populate_divs(stats);
+    const selected_stats = compute_stats(
+        filter_times_by_date(time_input, selected_date),
+        average_list,
+        graph_min,
+        graph_max,
+        solve_nums,
+        step,
+        streak_list,
+        ignore_dnf,
+        ignore_plus_two,
+    );
+
+    sample_label_div.hidden = false;
+    sample_label_div.textContent = `Selected Date (${selected_date})`;
+    sample_label_div.style.color = red;
+    selected_graph_box.hidden = false;
+
+    populate_graph('graph', full_stats.graph_data, blue, 'Full sample');
+
+    const selected_graph_data = selected_stats?.graph_data ?? full_stats.graph_data.map((row) => ({ time: row.time, count: 0 }));
+    populate_graph(
+        'selected-date-graph',
+        selected_graph_data,
+        red,
+        `Selected Date (${selected_date})`,
+    );
+
+    if (selected_stats === undefined) {
+        total_div.textContent = `No solves found for ${selected_date}.`;
+        return;
+    }
+
+    populate_divs(selected_stats);
+}
+
+/**
+ * Enable or disable date controls and update navigation boundaries.
+ * @param dates Sorted dates available in the current CSV.
+ */
+function update_date_controls(dates: string[]): void {
+    const has_dates = dates.length > 0;
+    const selected_date = date_input.value;
+
+    date_input.disabled = !has_dates;
+    clear_date_button.disabled = !has_dates || selected_date === '';
+    previous_date_button.disabled = get_adjacent_solve_date(dates, selected_date, -1) === undefined;
+    next_date_button.disabled = get_adjacent_solve_date(dates, selected_date, 1) === undefined;
+
+    if (has_dates) {
+        date_input.min = dates[0];
+        date_input.max = dates[dates.length - 1];
+    } else {
+        date_input.removeAttribute('min');
+        date_input.removeAttribute('max');
+    }
 }
 
 function main(): void {
     let time_input: CubeTime[] = [];
+    let available_dates: string[] = [];
+
+    const refresh = (): void => {
+        update_date_controls(available_dates);
+        draw_screen(time_input);
+    };
+
+    const select_adjacent_date = (direction: -1 | 1): void => {
+        const adjacent_date = get_adjacent_solve_date(available_dates, date_input.value, direction);
+        if (adjacent_date === undefined) return;
+
+        date_input.value = adjacent_date;
+        refresh();
+    };
 
     // draw screen with specific input method
     file_input_div.addEventListener('change', () => {
@@ -1038,30 +1176,39 @@ function main(): void {
             text_input_div.value = '';
             // FIXME: can we typecast here?
             time_input = csv_parse(reader.result as string);
-            date_input.disabled = !time_input.some((time) => time.date !== undefined);
-            if (date_input.disabled) date_input.value = '';
-            draw_screen(time_input);
+            available_dates = get_solve_dates(time_input);
+            date_input.value = '';
+            refresh();
         };
     });
 
     text_input_div.addEventListener('input', () => {
         file_input_div.value = '';
         date_input.value = '';
-        date_input.disabled = true;
+        available_dates = [];
         time_input = text_parse(text_input_div.value);
-        draw_screen(time_input);
+        refresh();
+    });
+
+    previous_date_button.addEventListener('click', () => select_adjacent_date(-1));
+    next_date_button.addEventListener('click', () => select_adjacent_date(1));
+    clear_date_button.addEventListener('click', () => {
+        date_input.value = '';
+        refresh();
     });
 
     // otherwise just draw screen
     min_input.addEventListener('input', () => draw_screen(time_input));
     max_input.addEventListener('input', () => draw_screen(time_input));
     numsolves_input.addEventListener('input', () => draw_screen(time_input));
-    date_input.addEventListener('input', () => draw_screen(time_input));
+    date_input.addEventListener('input', refresh);
     step_input.addEventListener('input', () => draw_screen(time_input));
     average_input.addEventListener('input', () => draw_screen(time_input));
     streak_input.addEventListener('input', () => draw_screen(time_input));
     ignore_dnf_input.addEventListener('input', () => draw_screen(time_input));
     ignore_plus_two_input.addEventListener('input', () => draw_screen(time_input));
+
+    update_date_controls(available_dates);
 }
 
 // Prevent tests from running main() but allow the browser to

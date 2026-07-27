@@ -61,12 +61,16 @@ The bar chart shows the distribution of solve times. Its range and bucket size c
 
 The defaults are 5 seconds minimum, 30 seconds maximum, and 1-second steps.
 
+When a date is selected from a timestamped CSV, two histograms are shown: the full sample in blue and the selected date in red directly beneath it. Each comparison graph has a title. Clearing the date restores the original single blue histogram without a title.
+
 ### Filtering and penalty controls
 
 The analyzer can be configured to:
 
 - Use only the most recent N solves from a session
-- Show only solves from a selected date when importing a timestamped CSV
+- Show statistics for a selected date when importing a timestamped CSV
+- Compare that date's histogram with the full sample
+- Move to the previous or next date containing solves, or clear the date filter
 - Ignore DNFs
 - Ignore `+2` penalties
 
@@ -76,9 +80,10 @@ Leaving the solve-count field empty analyzes the full imported session.
 
 1. Open the analyzer in a browser.
 2. Paste csTimer output into the text box or upload a csTimer CSV export.
-3. Optionally select a solve date after importing a timestamped CSV.
-4. Adjust graph, average, streak, solve-count, or penalty settings as needed.
-5. Review the calculated statistics and histogram.
+3. Optionally select a comparison date after importing a timestamped CSV.
+4. Use the arrow buttons to move between dates containing solves, or Clear to return to the full sample.
+5. Adjust graph, average, streak, solve-count, or penalty settings as needed.
+6. Review the selected date's statistics and its red histogram below the blue full-sample histogram.
 
 ## Development
 

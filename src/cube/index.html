@@ -10,7 +10,8 @@
     <body>
         <div id="main_div">
             <div id="div-container" class="sideways">
-                <div class="column">
+                <div id="summary-column" class="column">
+                    <div id="sample-label" class="child"></div>
                     <!-- total time solving -->
                     <div id="total_time" class="child"></div>
                     <!-- total # of solves -->
@@ -29,14 +30,32 @@
                 <div id="streak" class="column">
                     <!-- best, worst per avg (added dynamically) here-->
                 </div>
-                <div id="graph-box">
-                    <canvas id="graph" responsive="true"></canvas>
+                <div id="graphs">
+                    <div id="full-graph-box" class="graph-box">
+                        <canvas id="graph" responsive="true"></canvas>
+                    </div>
+                    <div id="selected-graph-box" class="graph-box" hidden>
+                        <canvas id="selected-date-graph" responsive="true"></canvas>
+                    </div>
                 </div>
             </div>
             <div class="sideways">
-                <div>
-                    <label for="file-input">Input a csv file:</label>
-                    <input type="file" id="file-input" name="file-input" accept=".csv"></input>
+                <div id="file-controls" class="column">
+                    <div>
+                        <label for="file-input">Input a csv file:</label>
+                        <input type="file" id="file-input" name="file-input" accept=".csv"></input>
+                    </div>
+                    <div id="date-controls">
+                        <label for="date-input">Compare Date:</label>
+                        <div class="date-input-row">
+                            <button type="button" id="previous-date-button" class="date-button"
+                            aria-label="Previous solve date" title="Previous solve date" disabled>&larr;</button>
+                            <input type="date" id="date-input" disabled></input>
+                            <button type="button" id="next-date-button" class="date-button"
+                            aria-label="Next solve date" title="Next solve date" disabled>&rarr;</button>
+                            <button type="button" id="clear-date-button" class="date-button" disabled>Clear</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="column">
                     <textarea class="noscroll" id="text-input" 
@@ -56,10 +75,6 @@
                     <div class="setting-div">
                         Number of Solves: 
                         <input type="number" id="numsolves-input" placeholder="all"></input>
-                    </div>
-                    <div class="setting-div">
-                        <label for="date-input">Solve Date:</label>
-                        <input type="date" id="date-input" disabled></input>
                     </div>
                     <div class="setting-div">
                         Step By: 

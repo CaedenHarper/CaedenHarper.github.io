@@ -51,6 +51,42 @@ input {
     width: auto;
 }
 
+
+#file-controls {
+    gap: 10px;
+}
+
+#date-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.date-input-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.date-button {
+    width: auto;
+    min-width: 2.2em;
+    padding: 0.1em 0.4em;
+    border: 1px solid white;
+    border-radius: 4px;
+    background-color: #0d0404;
+    color: white;
+    font-size: calc(0.8vw + 0.8vh);
+    cursor: pointer;
+}
+
+.date-button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+
 #file-input {
     width: auto;
     /* color: transparent; */
@@ -82,17 +118,37 @@ input {
     display: none;
 }
 
-#graph-box {
-    flex: 1;
-    max-width: 35vw;
+#sample-label {
+    font-size: calc(0.9vw + 0.9vh);
+    white-space: nowrap;
+}
+
+#graphs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    width: 100%;
+}
+
+.graph-box {
+    position: relative;
+    width: 100%;
+    height: 28vh;
 }
 
 #div-container {
-    flex-direction: row;
-    align-items: flex-start;    
-    justify-content: space-evenly;
-    /* background-color: aqua; */
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 2fr);
+    align-items: flex-start;
+    justify-content: initial;
     flex: auto;
+}
+
+#div-container > .column {
+    width: 100%;
+    min-width: 0;
+    height: auto;
 }
 
 .one-line {
