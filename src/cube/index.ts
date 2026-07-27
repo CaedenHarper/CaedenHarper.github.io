@@ -135,8 +135,8 @@ export class Average {
  */
 export class Stats {
     num_solves: number;
-    best_time: number;
-    worst_time: number;
+    best_time: number | null;
+    worst_time: number | null;
     num_plus_two: number;
     num_dnf: number;
     total_time_solving: number;
@@ -158,8 +158,8 @@ export class Stats {
      */
     constructor (
         num_solves: number,
-        best_time: number,
-        worst_time: number,
+        best_time: number | null,
+        worst_time: number | null,
         num_plus_two: number,
         num_dnf: number,
         total_time_solving: number,
@@ -660,8 +660,9 @@ export function compute_stats(
     let num_plus_two = 0;
     let total_time_solving = 0;
 
-    let best_time = times[0].num;
-    let worst_time = times[0].num;
+    // init as null to avoid first solve being a DNF
+    let best_time: number | null = null;
+    let worst_time: number | null = null;
 
     // bins that split histogram:
     // starts at graph_min - step and end at graph_max + step
@@ -698,19 +699,10 @@ export function compute_stats(
     for (let index = 0; index < adjusted_times.length; index += 1) {
         // make copy of time
         const time = adjusted_times[index].copy();
-        num_solves += 1;
-        // Handle ignore +2 and ignore DNF flags
-        if (ignore_dnf) {
-            time.dnf = false;
-        }
 
-        if (ignore_plus_two && time.plus_two) {
-            time.num -= 2;
-            time.plus_two = false;
-        }
+        num_solves += 1;
 
         if (time.plus_two) num_plus_two += 1;
-
 
         for (const [key, value] of average_dict) {
             const to_average = adjusted_times.slice(index, index + key);
@@ -761,8 +753,8 @@ export function compute_stats(
             }
         }
 
-        if (num < best_time) best_time = num;
-        if (num > worst_time) worst_time = num;
+        if (best_time == null || num < best_time) best_time = num;
+        if (worst_time == null || num > worst_time) worst_time = num;
     }
 
     if (num_solves < 1) {
@@ -797,16 +789,18 @@ function populate_divs(stats: Stats): void {
     // show best time in html
     add_to_parent(best_time_div, 'Best', 'remove-refresh one-line green');
     add_to_parent(best_time_div, `${space}time:${space}`, 'remove-refresh one-line');
-    add_to_parent(best_time_div, stats.best_time.toString(), 'remove-refresh one-line');
+    add_to_parent(best_time_div, stats.best_time?.toString() ?? 'n/a', 'remove-refresh one-line');
 
     // show worst time in html
     add_to_parent(worst_time_div, 'Worst', 'remove-refresh one-line red');
     add_to_parent(worst_time_div, `${space}time:${space}`, 'remove-refresh one-line');
-    add_to_parent(worst_time_div, stats.worst_time.toString(), 'remove-refresh one-line');
+    add_to_parent(worst_time_div, stats.worst_time?.toString() ?? 'n/a', 'remove-refresh one-line');
 
     // show mean time in html
     const mean_time = stats.total_time_solving / (stats.num_solves - stats.num_dnf);
-    mean_div.textContent = `Mean: ${truncate_to_two_decimal_places(mean_time)}`;
+    let mean_time_str = 'n/a'; // might be infinity
+    if (isFinite(mean_time)) mean_time_str = truncate_to_two_decimal_places(mean_time).toString();
+    mean_div.textContent = `Mean: ${mean_time_str}`;
 
     // show DNF count in html
     // dnf_div.textContent = `DNFs: ${num_dnf}`;
