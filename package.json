@@ -4,9 +4,9 @@
   "scripts": {
     "start": "parcel ./src/index.html --no-hmr",
     "prebuild-dev": "shx rm -rf dist/*",
-    "build-dev": "parcel build ./src/index.html --no-optimize --public-url ./",
+    "build-dev": "parcel build ./src/index.html --no-optimize",
     "prebuild": "shx rm -rf dist/*",
-    "build": "parcel build ./src/index.html --public-url ./",
+    "build": "parcel build ./src/index.html",
     "push-gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup --verbose",
     "test": "jest"
   },
