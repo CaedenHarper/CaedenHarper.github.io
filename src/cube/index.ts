@@ -990,7 +990,7 @@ function draw_screen(time_input: CubeTime[]): void {
 }
 
 function main(): void {
-    let time_input: CubeTime[];
+    let time_input: CubeTime[] = [];
 
     // draw screen with specific input method
     file_input_div.addEventListener('change', () => {
