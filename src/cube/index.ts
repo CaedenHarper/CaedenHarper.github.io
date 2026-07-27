@@ -679,10 +679,25 @@ export function compute_stats(
         graph_data.push({ time: truncate_to_two_decimal_places(value), count: 0 });
     }
 
-    const numtimes: number[] = [];
-    for (let index = 0; index < times.length; index += 1) {
+    // adjust times based on dnf, plus_two settings
+    const adjusted_times = times.map((original_time) => {
+        const time = original_time.copy();
+
+        if (ignore_dnf) {
+            time.dnf = false;
+        }
+
+        if (ignore_plus_two && time.plus_two) {
+            time.num -= 2;
+            time.plus_two = false;
+        }
+
+        return time;
+    });
+
+    for (let index = 0; index < adjusted_times.length; index += 1) {
         // make copy of time
-        const time = times[index].copy();
+        const time = adjusted_times[index].copy();
         num_solves += 1;
         // Handle ignore +2 and ignore DNF flags
         if (ignore_dnf) {
@@ -698,7 +713,7 @@ export function compute_stats(
 
 
         for (const [key, value] of average_dict) {
-            const to_average = times.slice(index, index + key);
+            const to_average = adjusted_times.slice(index, index + key);
 
             // Not enough solves
             if (to_average.length != key) continue;
@@ -748,8 +763,6 @@ export function compute_stats(
 
         if (num < best_time) best_time = num;
         if (num > worst_time) worst_time = num;
-
-        numtimes.push(num);
     }
 
     if (num_solves < 1) {
