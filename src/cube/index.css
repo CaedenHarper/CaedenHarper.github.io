@@ -123,6 +123,12 @@ input {
     white-space: nowrap;
 }
 
+.comparison-stat {
+    font-size: calc(0.72vw + 0.72vh);
+    line-height: 1.2;
+    max-width: 100%;
+}
+
 #graphs {
     display: flex;
     flex-direction: column;

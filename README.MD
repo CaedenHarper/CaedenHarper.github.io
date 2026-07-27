@@ -26,6 +26,10 @@ The analyzer calculates and displays:
 - Best single
 - Worst single
 - Mean solve time
+- Median solve time
+- Consistency measured by interquartile range (IQR)
+- DNF rate
+- `+2` rate
 
 Statistics update immediately whenever the solve data or a setting changes.
 
@@ -61,7 +65,7 @@ The bar chart shows the distribution of solve times. Its range and bucket size c
 
 The defaults are 5 seconds minimum, 30 seconds maximum, and 1-second steps.
 
-When a date is selected from a timestamped CSV, two histograms are shown: the full sample in blue and the selected date in red directly beneath it. Each comparison graph has a title. Clearing the date restores the original single blue histogram without a title.
+When a date is selected from a timestamped CSV, a blue Solve history histogram is shown above a red histogram for the selected date. Each histogram includes a green dashed median marker. Clearing the date restores the original single untitled histogram.
 
 ### Filtering and penalty controls
 
@@ -69,7 +73,7 @@ The analyzer can be configured to:
 
 - Use only the most recent N solves from a session
 - Show statistics for a selected date when importing a timestamped CSV
-- Compare that date's histogram with the full sample
+- Compare that date's histogram and summary statistics with the solve history
 - Move to the previous or next date containing solves, or clear the date filter
 - Ignore DNFs
 - Ignore `+2` penalties
@@ -81,9 +85,9 @@ Leaving the solve-count field empty analyzes the full imported session.
 1. Open the analyzer in a browser.
 2. Paste csTimer output into the text box or upload a csTimer CSV export.
 3. Optionally select a comparison date after importing a timestamped CSV.
-4. Use the arrow buttons to move between dates containing solves, or Clear to return to the full sample.
+4. Use the arrow buttons to move between dates containing solves, or Clear to return to the solve history.
 5. Adjust graph, average, streak, solve-count, or penalty settings as needed.
-6. Review the selected date's statistics and its red histogram below the blue full-sample histogram.
+6. Review the selected date's existing statistics plus its median, IQR consistency, DNF rate, and `+2` rate against the solve history.
 
 ## Development
 

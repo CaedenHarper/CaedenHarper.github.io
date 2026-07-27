@@ -1,4 +1,4 @@
-import Chart, { ChartItem } from 'chart.js/auto';
+import Chart, { ChartItem, Plugin } from 'chart.js/auto';
 // FUTURE:
 // add line graph
 // FIXME:
@@ -30,6 +30,14 @@ const dnf_div = document.getElementById('DNF')!;
 const plus_two_div = document.getElementById('plus_two')!;
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- this is probably fine
 const mean_div = document.getElementById('mean')!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- this is probably fine
+const median_div = document.getElementById('median')!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- this is probably fine
+const consistency_div = document.getElementById('consistency')!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- this is probably fine
+const dnf_rate_div = document.getElementById('dnf-rate')!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- this is probably fine
+const plus_two_rate_div = document.getElementById('plus-two-rate')!;
 const min_input = document.getElementById('min-input') as HTMLInputElement;
 const max_input = document.getElementById('max-input') as HTMLInputElement;
 const numsolves_input = document.getElementById('numsolves-input') as HTMLInputElement;
@@ -49,6 +57,7 @@ const red = '#D81616';
 const white = '#FFFFFF';
 const black = '#000000';
 const light_blue = '#89CFF0';
+const green = '#12D04B';
 
 // non compressable space -- used for spaces between divs
 const space = String.fromCharCode(160);
@@ -154,6 +163,8 @@ export class Stats {
     average_dict: Map<number, Average[]>;
     streak_dict: Map<number, [number, number]>;
     graph_data: { time: number; count: number }[];
+    median_time: number | undefined;
+    interquartile_range: number | undefined;
 
     /**
      * Populate divs with information
@@ -166,6 +177,8 @@ export class Stats {
      * @param average_dict TODO
      * @param streak_dict TODO
      * @param graph_data TODO
+     * @param median_time Median of all non-DNF solve times
+     * @param interquartile_range Difference between the 75th and 25th percentiles
      */
     constructor (
         num_solves: number,
@@ -177,6 +190,8 @@ export class Stats {
         average_dict: Map<number, Average[]>,
         streak_dict: Map<number, [number, number]>,
         graph_data: { time: number; count: number }[],
+        median_time: number | undefined,
+        interquartile_range: number | undefined,
     ) {
         this.num_solves = num_solves;
         this.best_time = best_time;
@@ -187,6 +202,8 @@ export class Stats {
         this.average_dict = average_dict;
         this.streak_dict = streak_dict;
         this.graph_data = graph_data;
+        this.median_time = median_time;
+        this.interquartile_range = interquartile_range;
     }
 }
 
@@ -587,6 +604,48 @@ export function validate_step(step: number): number {
 }
 
 // TODO: consider creating a streak class to make the logic clearer here
+/**
+ * Calculate a percentile using linear interpolation between adjacent values.
+ * @param sorted_values Values sorted from smallest to largest.
+ * @param percentile Percentile between 0 and 1.
+ */
+function percentile_from_sorted(sorted_values: number[], percentile: number): number | undefined {
+    if (sorted_values.length < 1) return;
+
+    const position = (sorted_values.length - 1) * percentile;
+    const lower_index = Math.floor(position);
+    const upper_index = Math.ceil(position);
+    const lower = sorted_values[lower_index];
+    const upper = sorted_values[upper_index];
+
+    return lower + (upper - lower) * (position - lower_index);
+}
+
+/**
+ * Calculate the median of a list of numbers.
+ * @param values Values to summarize.
+ */
+export function calculate_median(values: number[]): number | undefined {
+    const sorted_values = [...values].sort((a, b) => a - b);
+    return percentile_from_sorted(sorted_values, 0.5);
+}
+
+/**
+ * Calculate the interquartile range of a list of numbers.
+ * A smaller IQR indicates more consistent solve times.
+ * @param values Values to summarize.
+ */
+export function calculate_interquartile_range(values: number[]): number | undefined {
+    if (values.length < 2) return;
+
+    const sorted_values = [...values].sort((a, b) => a - b);
+    const first_quartile = percentile_from_sorted(sorted_values, 0.25);
+    const third_quartile = percentile_from_sorted(sorted_values, 0.75);
+
+    if (first_quartile === undefined || third_quartile === undefined) return;
+    return third_quartile - first_quartile;
+}
+
 // TODO: unit test
 
 /**
@@ -824,6 +883,9 @@ export function compute_stats(
         return;
     }
 
+    const median_time = calculate_median(numtimes);
+    const interquartile_range = calculate_interquartile_range(numtimes);
+
     return new Stats(
         num_solves,
         best_time,
@@ -834,6 +896,8 @@ export function compute_stats(
         average_dict,
         streak_dict,
         graph_data,
+        median_time,
+        interquartile_range,
     );
 }
 
@@ -844,7 +908,7 @@ export function compute_stats(
  * Populate divs with information from statistics object.
  * @param stats Statistics object with timing information.
  */
-function populate_divs(stats: Stats): void {
+function populate_divs(stats: Stats, solve_history_stats?: Stats): void {
     // show total in html
     total_div.textContent = `Total solves: ${stats.num_solves}`;
 
@@ -865,6 +929,94 @@ function populate_divs(stats: Stats): void {
         mean_div.textContent = `Mean: ${truncate_to_two_decimal_places(mean_time)}`;
     } else {
         mean_div.textContent = 'Mean: N/A';
+    }
+
+    const format_rate = (count: number, total: number): string => {
+        if (total < 1) return 'N/A';
+        return `${(count / total * 100).toFixed(1)}%`;
+    };
+
+    const difference_text = (
+        selected_value: number,
+        history_value: number,
+        lower_word: string,
+        higher_word: string,
+        unit: string,
+        decimal_places = 2,
+    ): string => {
+        const difference = history_value - selected_value;
+        const tolerance = 0.5 * 10 ** -decimal_places;
+        if (Math.abs(difference) < tolerance) return 'same as solve history';
+
+        const word = difference > 0 ? lower_word : higher_word;
+        return `${Math.abs(difference).toFixed(decimal_places)}${unit} ${word}`;
+    };
+
+    if (stats.median_time === undefined) {
+        median_div.textContent = 'Median: N/A';
+    } else if (solve_history_stats?.median_time === undefined) {
+        median_div.textContent = `Median: ${stats.median_time.toFixed(2)}s`;
+    } else {
+        const comparison = difference_text(
+            stats.median_time,
+            solve_history_stats.median_time,
+            'faster',
+            'slower',
+            's',
+        );
+        median_div.textContent = `Median: ${stats.median_time.toFixed(2)}s (Solve history: ${solve_history_stats.median_time.toFixed(2)}s; ${comparison})`;
+    }
+
+    if (stats.interquartile_range === undefined) {
+        consistency_div.textContent = 'Consistency (IQR): N/A';
+    } else if (solve_history_stats?.interquartile_range === undefined) {
+        consistency_div.textContent = `Consistency (IQR): ${stats.interquartile_range.toFixed(2)}s`;
+    } else {
+        const comparison = difference_text(
+            stats.interquartile_range,
+            solve_history_stats.interquartile_range,
+            'tighter',
+            'wider',
+            's',
+        );
+        consistency_div.textContent = `Consistency (IQR): ${stats.interquartile_range.toFixed(2)}s (Solve history: ${solve_history_stats.interquartile_range.toFixed(2)}s; ${comparison})`;
+    }
+
+    const history_stats = solve_history_stats;
+    const dnf_rate = stats.num_solves < 1 ? undefined : stats.num_dnf / stats.num_solves;
+    const history_dnf_rate = history_stats === undefined || history_stats.num_solves < 1
+        ? undefined
+        : history_stats.num_dnf / history_stats.num_solves;
+    if (dnf_rate === undefined || history_dnf_rate === undefined || history_stats === undefined) {
+        dnf_rate_div.textContent = `DNF rate: ${format_rate(stats.num_dnf, stats.num_solves)}`;
+    } else {
+        const comparison = difference_text(
+            dnf_rate * 100,
+            history_dnf_rate * 100,
+            'lower',
+            'higher',
+            ' pp',
+            1,
+        );
+        dnf_rate_div.textContent = `DNF rate: ${format_rate(stats.num_dnf, stats.num_solves)} (Solve history: ${format_rate(history_stats.num_dnf, history_stats.num_solves)}; ${comparison})`;
+    }
+
+    const plus_two_rate = stats.num_solves < 1 ? undefined : stats.num_plus_two / stats.num_solves;
+    const history_plus_two_rate = history_stats === undefined || history_stats.num_solves < 1
+        ? undefined
+        : history_stats.num_plus_two / history_stats.num_solves;
+    if (plus_two_rate === undefined || history_plus_two_rate === undefined || history_stats === undefined) {
+        plus_two_rate_div.textContent = `+2 rate: ${format_rate(stats.num_plus_two, stats.num_solves)}`;
+    } else {
+        const comparison = difference_text(
+            plus_two_rate * 100,
+            history_plus_two_rate * 100,
+            'lower',
+            'higher',
+            ' pp',
+            1,
+        );
+        plus_two_rate_div.textContent = `+2 rate: ${format_rate(stats.num_plus_two, stats.num_solves)} (Solve history: ${format_rate(history_stats.num_plus_two, history_stats.num_solves)}; ${comparison})`;
     }
 
     // show DNF count in html
@@ -935,16 +1087,70 @@ function populate_divs(stats: Stats): void {
 // TODO: unit test
 
 /**
+ * Create a plugin that draws a median marker over a histogram.
+ * @param plugin_id Unique plugin ID for the chart.
+ * @param graph_data Histogram boundaries.
+ * @param median_time Median solve time.
+ */
+function create_median_plugin(
+    plugin_id: string,
+    graph_data: { time: number; count: number }[],
+    median_time: number | undefined,
+): Plugin<'bar'> {
+    return {
+        id: plugin_id,
+        afterDatasetsDraw: (chart: Chart<'bar'>): void => {
+            const first_boundary = graph_data[0]?.time;
+            const final_boundary = graph_data[graph_data.length - 1]?.time;
+            if (
+                median_time === undefined ||
+                median_time < first_boundary ||
+                median_time > final_boundary ||
+                final_boundary <= first_boundary
+            ) return;
+
+            const { ctx, chartArea } = chart;
+            const position = (median_time - first_boundary) / (final_boundary - first_boundary);
+            const x_position = chartArea.left + position * (chartArea.right - chartArea.left);
+            const label = `Median ${median_time.toFixed(2)}`;
+
+            ctx.save();
+            ctx.strokeStyle = green;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            ctx.moveTo(x_position, chartArea.top);
+            ctx.lineTo(x_position, chartArea.bottom);
+            ctx.stroke();
+
+            ctx.font = 'bold 12px sans-serif';
+            const label_width = ctx.measureText(label).width;
+            const label_x = Math.min(
+                Math.max(x_position + 6, chartArea.left + 6),
+                chartArea.right - label_width - 8,
+            );
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+            ctx.fillRect(label_x - 4, chartArea.top + 4, label_width + 8, 18);
+            ctx.fillStyle = green;
+            ctx.fillText(label, label_x, chartArea.top + 17);
+            ctx.restore();
+        },
+    };
+}
+
+/**
  * Populate one histogram.
  * @param graph_id Canvas element ID.
  * @param graph_data Histogram data to display.
  * @param background_color Bar color.
+ * @param median_time Median solve time to mark on the graph.
  * @param title Optional chart title.
  */
 function populate_graph(
     graph_id: string,
     graph_data: { time: number; count: number }[],
     background_color: string,
+    median_time: number | undefined,
     title = '',
 ): void {
     // TODO: make chart clearly show the min and max for each bucket
@@ -962,6 +1168,7 @@ function populate_graph(
         graph as ChartItem,
         {
             type: 'bar',
+            plugins: [create_median_plugin(`median-${graph_id}`, graph_data, median_time)],
             options: {
                 maintainAspectRatio: false,
                 plugins: {
@@ -1003,6 +1210,10 @@ function clear_divs(): void {
     total_time_div.textContent = '';
     total_div.textContent = '';
     mean_div.textContent = '';
+    median_div.textContent = '';
+    consistency_div.textContent = '';
+    dnf_rate_div.textContent = '';
+    plus_two_rate_div.textContent = '';
 
     // remove all divs
     const to_remove = document.getElementsByClassName('remove-refresh');
@@ -1083,7 +1294,7 @@ function draw_screen(time_input: CubeTime[]): void {
     if (full_stats === undefined) return;
 
     if (selected_date === '') {
-        populate_graph('graph', full_stats.graph_data, blue);
+        populate_graph('graph', full_stats.graph_data, blue, full_stats.median_time);
         populate_divs(full_stats);
         return;
     }
@@ -1105,13 +1316,14 @@ function draw_screen(time_input: CubeTime[]): void {
     sample_label_div.style.color = red;
     selected_graph_box.hidden = false;
 
-    populate_graph('graph', full_stats.graph_data, blue, 'Full sample');
+    populate_graph('graph', full_stats.graph_data, blue, full_stats.median_time, 'Solve history');
 
     const selected_graph_data = selected_stats?.graph_data ?? full_stats.graph_data.map((row) => ({ time: row.time, count: 0 }));
     populate_graph(
         'selected-date-graph',
         selected_graph_data,
         red,
+        selected_stats?.median_time,
         `Selected Date (${selected_date})`,
     );
 
@@ -1120,7 +1332,7 @@ function draw_screen(time_input: CubeTime[]): void {
         return;
     }
 
-    populate_divs(selected_stats);
+    populate_divs(selected_stats, full_stats);
 }
 
 /**
