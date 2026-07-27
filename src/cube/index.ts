@@ -1029,6 +1029,7 @@ function main(): void {
 
 // Prevent tests from running main() but allow the browser to
 // See https://stackoverflow.com/a/52231746
+// @ts-expect-error: Suppress TS2591; this is the only time we use process
 if (process.env.JEST_WORKER_ID === undefined || process.env.NODE_ENV !== 'test') {
     main();
 } else console.log('Detected to be running in test environment.');

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": true,
     "outDir": "./built",
     "allowJs": false,
     "target": "ES2021",
@@ -17,6 +18,5 @@
     "isolatedModules": true
   },    
   "include": ["./src/**/*", "./tests/**/*"],
-  "exclude": ["./dist/**/*", "./eslint.config.mjs"],
-  "strict": true
+  "exclude": ["./dist/**/*", "./eslint.config.mjs"]
 }
