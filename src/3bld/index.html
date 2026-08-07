@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>3BLD Letter Pair Practice</title>
+        <link rel="stylesheet" href="./index.css">
+    </head>
+    <body>
+        <div id="main_div">
+            <header id="topbar">
+                <div class="topbar-side">
+                    <button type="button" id="back-main" class="secondary-button" hidden>
+                        Back to Main Menu
+                    </button>
+                </div>
+                <h1 id="page-title">3BLD Letter Pair Practice</h1>
+                <div id="practice-controls" class="topbar-side right-controls" hidden>
+                    <button type="button" id="change-constraint" class="secondary-button" hidden></button>
+                    <button type="button" id="finish-button">Finish</button>
+                </div>
+            </header>
+
+            <main id="content">
+                <section id="menu-screen" class="screen menu-card">
+                    <h2>Choose Practice Mode</h2>
+                    <div class="menu-buttons">
+                        <button type="button" id="all-words-button">All Words</button>
+                        <button type="button" id="specific-letters-button">Specific Starting Letter</button>
+                        <button type="button" id="specific-pairs-button">Specific Pairs</button>
+                    </div>
+                </section>
+
+                <section id="letter-screen" class="screen selector-card" hidden>
+                    <h2>Starting Letters</h2>
+                    <p>Choose one or more starting letters.</p>
+                    <div id="letter-grid" class="letter-grid"></div>
+                    <div class="selector-footer">
+                        <button type="button" id="continue-letters" disabled>Continue</button>
+                    </div>
+                </section>
+
+                <section id="pair-screen" class="screen selector-card" hidden>
+                    <h2>Specific Pairs</h2>
+                    <p>Choose pairs directly, or use a row/column header to toggle that whole axis.</p>
+                    <div class="pair-grid-wrap">
+                        <div id="pair-grid" class="pair-grid"></div>
+                    </div>
+                    <div class="selector-footer">
+                        <button type="button" id="continue-pairs" disabled>Continue</button>
+                    </div>
+                </section>
+
+                <section id="practice-screen" class="screen practice-card" hidden>
+                    <div id="pair-display" class="pair-display"></div>
+                    <div id="no-words" class="no-words" hidden>No Words Available!</div>
+
+                    <form id="answer-form" class="answer-row">
+                        <label for="answer-input" class="visually-hidden">Answer</label>
+                        <input
+                            id="answer-input"
+                            type="text"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            placeholder="Word..."
+                        >
+                        <button type="submit">Answer</button>
+                    </form>
+
+                    <div id="warning-row" class="warning-row" hidden>
+                        <span id="warning-text"></span>
+                        <button type="button" id="mark-incorrect" class="secondary-button">Mark as Incorrect</button>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat-line"><span>Total Guesses</span><strong id="total-guesses">0</strong></div>
+                        <div class="stat-line"><span>Total Correct</span><strong id="total-correct">0</strong></div>
+                        <div class="stat-line"><span>Total Incorrect</span><strong id="total-incorrect">0</strong></div>
+                        <div class="stat-line"><span>Correct Percentage</span><strong id="correct-percentage">0.00%</strong></div>
+                        <div id="needs-work-row" class="stat-line" hidden>
+                            <span>Needs Work</span>
+                            <strong id="needs-work"></strong>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <div id="finish-modal" class="modal-backdrop" hidden>
+            <section class="modal" role="dialog" aria-modal="true" aria-labelledby="finish-title">
+                <h2 id="finish-title">Session Results</h2>
+                <div class="stats">
+                    <div class="stat-line"><span>Total Guesses</span><strong id="finish-total-guesses">0</strong></div>
+                    <div class="stat-line"><span>Total Correct</span><strong id="finish-total-correct">0</strong></div>
+                    <div class="stat-line"><span>Total Incorrect</span><strong id="finish-total-incorrect">0</strong></div>
+                    <div class="stat-line"><span>Correct Percentage</span><strong id="finish-correct-percentage">0.00%</strong></div>
+                </div>
+                <div class="failed-list">
+                    <h3>Needs Work</h3>
+                    <div id="failed-list"></div>
+                </div>
+                <button type="button" id="modal-main" class="secondary-button">Back to Main Menu</button>
+            </section>
+        </div>
+
+        <script type="module" src="./index.ts"></script>
+    </body>
+</html>

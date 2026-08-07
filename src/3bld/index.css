@@ -1,0 +1,401 @@
+/* import main site style */
+@import "../index.css";
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: white;
+}
+
+body,
+button,
+input {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+div {
+    color: white;
+    font-size: calc(0.8vw + 0.8vh);
+    font-weight: normal;
+}
+
+#main_div {
+    position: static;
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    margin: 0;
+    justify-content: flex-start;
+}
+
+#topbar {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(280px, 2fr) minmax(180px, 1fr);
+    align-items: center;
+    width: 100%;
+    min-height: 86px;
+    padding: 12px 2vw;
+    border-bottom: 1px solid rgb(75, 75, 75);
+}
+
+#page-title {
+    margin: 0;
+    color: rgb(255, 91, 198);
+    font-size: calc(1.25vw + 1.25vh);
+    text-align: center;
+}
+
+.topbar-side {
+    display: flex;
+    gap: 8px;
+}
+
+.right-controls {
+    justify-content: flex-end;
+}
+
+#content {
+    width: min(1180px, 96vw);
+    margin: 0 auto;
+    padding: 3vh 0 6vh;
+}
+
+.screen {
+    width: 100%;
+}
+
+.menu-card,
+.selector-card,
+.practice-card,
+.modal {
+    border: 1px solid rgb(90, 90, 90);
+    border-radius: 8px;
+    background-color: rgb(20, 12, 12);
+}
+
+.menu-card {
+    width: min(560px, 100%);
+    margin: 7vh auto 0;
+    padding: 2vw;
+}
+
+h2,
+h3,
+p {
+    color: white;
+}
+
+h2 {
+    margin-top: 0;
+    color: rgb(255, 91, 198);
+    font-size: calc(1vw + 1vh);
+}
+
+h3 {
+    color: rgb(255, 91, 198);
+}
+
+p {
+    font-size: calc(0.72vw + 0.72vh);
+}
+
+button,
+input {
+    border: 1px solid white;
+    border-radius: 4px;
+    background-color: #0d0404;
+    color: white;
+    font-size: calc(0.72vw + 0.72vh);
+}
+
+button {
+    padding: 0.45em 0.8em;
+    cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+    border-color: rgb(255, 91, 198);
+    color: rgb(255, 91, 198);
+}
+
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid rgb(1, 99, 185);
+    outline-offset: 2px;
+}
+
+button:disabled {
+    cursor: default;
+    opacity: 0.4;
+}
+
+.secondary-button {
+    border-color: rgb(130, 130, 130);
+}
+
+.menu-buttons {
+    display: grid;
+    gap: 12px;
+}
+
+.menu-buttons button {
+    min-height: 52px;
+    border-color: rgb(1, 99, 185);
+    color: rgb(255, 91, 198);
+    font-weight: bold;
+}
+
+.selector-card {
+    padding: 2vw;
+}
+
+.letter-grid {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(50px, 1fr));
+    gap: 8px;
+}
+
+.letter-choice,
+.pair-choice,
+.axis-choice {
+    min-height: 44px;
+}
+
+.letter-choice.selected,
+.pair-choice.selected,
+.axis-choice.selected {
+    border-color: rgb(255, 91, 198);
+    background-color: rgb(1, 99, 185);
+    color: white;
+    font-weight: bold;
+}
+
+.selector-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+}
+
+.pair-grid-wrap {
+    max-height: 64vh;
+    overflow: auto;
+    border: 1px solid rgb(90, 90, 90);
+}
+
+.pair-grid {
+    display: grid;
+    grid-template-columns: 58px repeat(24, 52px);
+    width: max-content;
+    gap: 1px;
+    background-color: rgb(75, 75, 75);
+}
+
+.grid-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    min-height: 44px;
+    background-color: #0d0404;
+}
+
+.grid-corner {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    width: 58px;
+    background-color: rgb(30, 30, 30);
+    font-size: 12px;
+}
+
+.grid-header {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    background-color: rgb(30, 30, 30);
+}
+
+.grid-row-header {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    width: 58px;
+    background-color: rgb(30, 30, 30);
+}
+
+.axis-choice,
+.pair-choice {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+}
+
+.practice-card {
+    width: min(760px, 100%);
+    margin: 3vh auto 0;
+    padding: 3vw;
+    text-align: center;
+}
+
+.pair-display,
+.no-words {
+    color: rgb(255, 91, 198);
+    font-size: calc(4vw + 3.5vh);
+    font-weight: bold;
+}
+
+.pair-display {
+    margin: 1vh 0 3vh;
+}
+
+.no-words {
+    margin: 5vh 0;
+    font-size: calc(2vw + 2vh);
+}
+
+.answer-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    width: min(540px, 100%);
+    margin: 0 auto;
+}
+
+.answer-row input {
+    min-width: 0;
+    padding: 0.55em 0.7em;
+}
+
+.stats {
+    width: min(460px, 100%);
+    margin: 3vh auto 0;
+    font-size: calc(0.75vw + 0.75vh);
+    text-align: left;
+}
+
+.stat-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0.35em 0;
+    border-bottom: 1px solid rgb(65, 65, 65);
+}
+
+.stat-line strong {
+    color: rgb(18, 208, 75);
+    text-align: right;
+}
+
+.warning-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: min(680px, 100%);
+    margin: 3vh auto 0;
+    padding: 0.75em;
+    border: 1px solid rgb(236, 169, 75);
+    border-radius: 5px;
+    color: rgb(236, 169, 75);
+    font-size: calc(0.68vw + 0.68vh);
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal {
+    width: min(560px, 100%);
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.modal .stats {
+    margin-top: 1vh;
+}
+
+.failed-list {
+    margin: 2vh 0;
+}
+
+.failed-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0.35em 0;
+    border-bottom: 1px solid rgb(65, 65, 65);
+}
+
+.failed-item strong {
+    color: rgb(216, 22, 22);
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 760px) {
+    #topbar {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 14px;
+    }
+
+    #page-title {
+        grid-row: 1;
+        font-size: 24px;
+    }
+
+    .topbar-side,
+    .right-controls {
+        justify-content: center;
+    }
+
+    .letter-grid {
+        grid-template-columns: repeat(4, minmax(50px, 1fr));
+    }
+
+    .practice-card,
+    .selector-card,
+    .menu-card {
+        padding: 18px;
+    }
+
+    .pair-display {
+        font-size: 64px;
+    }
+
+    p,
+    button,
+    input,
+    .stats,
+    .warning-row,
+    div {
+        font-size: 16px;
+    }
+}
