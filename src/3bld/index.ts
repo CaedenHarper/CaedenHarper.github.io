@@ -118,6 +118,7 @@ const failed_list = get_element('failed-list', HTMLDivElement);
 const modal_main_button = get_element('modal-main', HTMLButtonElement);
 
 const all_pairs = make_all_pairs(letters);
+const saved_word_data_key = '3bld-word-data';
 let word_map: WordMap = {};
 let incorrect_feedback_timeout: number | undefined;
 
@@ -170,6 +171,13 @@ function use_parsed_word_data(parsed_data: ParsedWordData, source: string): void
     }
 
     word_map = parsed_data.word_map;
+
+    try {
+        localStorage.setItem(saved_word_data_key, JSON.stringify(parsed_data));
+    } catch (error: unknown) {
+        console.warn('Unable to save 3BLD word data:', error);
+    }
+
     state.selected_letters.clear();
     state.selected_pairs.clear();
     set_word_dependent_buttons_enabled(true);
@@ -178,6 +186,21 @@ function use_parsed_word_data(parsed_data: ParsedWordData, source: string): void
         ? ''
         : ` (${parsed_data.warning_count} warning${parsed_data.warning_count === 1 ? '' : 's'}; see console)`;
     set_word_file_status(`${word_count} letter pairs loaded${warning_suffix}.`, 'loaded');
+}
+
+function load_saved_word_data(): void {
+    const saved_data = localStorage.getItem(saved_word_data_key);
+    if (saved_data === null) return;
+
+    try {
+        use_parsed_word_data(
+            JSON.parse(saved_data) as ParsedWordData,
+            'saved data',
+        );
+    } catch (error: unknown) {
+        console.warn('Unable to load saved 3BLD word data:', error);
+        localStorage.removeItem(saved_word_data_key);
+    }
 }
 
 function report_word_load_error(error: unknown): void {
@@ -754,4 +777,5 @@ answer_form.addEventListener('submit', (event) => {
     submit_guess(answer_input.value);
 });
 
+load_saved_word_data();
 set_screen('menu');
