@@ -1,4 +1,5 @@
-import { letters, word_map } from './data.ts';
+import { json_to_word_map, letters, parse_word_json } from './data.ts';
+import type { ParsedWordData, WordMap } from './data.ts';
 import type { PracticeMode } from './utils.ts';
 import {
     available_pairs,
@@ -12,7 +13,7 @@ import {
     update_failure_count,
 } from './utils.ts';
 
-type Screen = 'menu' | 'letter-select' | 'pair-select' | 'practice';
+type Screen = 'menu' | 'letter-select' | 'pair-select' | 'loaded-pairs' | 'practice';
 
 interface LastResult {
     pair: string;
@@ -71,17 +72,27 @@ const finish_button = get_element('finish-button', HTMLButtonElement);
 const menu_screen = get_element('menu-screen', HTMLElement);
 const letter_screen = get_element('letter-screen', HTMLElement);
 const pair_screen = get_element('pair-screen', HTMLElement);
+const loaded_pairs_screen = get_element('loaded-pairs-screen', HTMLElement);
 const practice_screen = get_element('practice-screen', HTMLElement);
+
+const word_file_input = get_element('word-file-input', HTMLInputElement);
+const word_file_status = get_element('word-file-status', HTMLParagraphElement);
+const example_word_file_button = get_element('example-word-file', HTMLButtonElement);
 
 const all_words_button = get_element('all-words-button', HTMLButtonElement);
 const specific_letters_button = get_element('specific-letters-button', HTMLButtonElement);
 const specific_pairs_button = get_element('specific-pairs-button', HTMLButtonElement);
+const view_loaded_pairs_button = get_element('view-loaded-pairs-button', HTMLButtonElement);
 
 const letter_grid = get_element('letter-grid', HTMLDivElement);
 const continue_letters_button = get_element('continue-letters', HTMLButtonElement);
 const pair_grid = get_element('pair-grid', HTMLDivElement);
 const continue_pairs_button = get_element('continue-pairs', HTMLButtonElement);
+const loaded_pairs_empty = get_element('loaded-pairs-empty', HTMLDivElement);
+const loaded_pairs_list = get_element('loaded-pairs-list', HTMLDivElement);
 
+const incorrect_feedback = get_element('incorrect-feedback', HTMLDivElement);
+const pair_box = get_element('pair-box', HTMLDivElement);
 const pair_display = get_element('pair-display', HTMLDivElement);
 const no_words_div = get_element('no-words', HTMLDivElement);
 const answer_form = get_element('answer-form', HTMLFormElement);
@@ -89,6 +100,7 @@ const answer_input = get_element('answer-input', HTMLInputElement);
 const warning_row = get_element('warning-row', HTMLDivElement);
 const warning_text = get_element('warning-text', HTMLSpanElement);
 const mark_incorrect_button = get_element('mark-incorrect', HTMLButtonElement);
+const pairs_loaded_count = get_element('pairs-loaded-count', HTMLSpanElement);
 
 const total_guesses = get_element('total-guesses', HTMLElement);
 const total_correct = get_element('total-correct', HTMLElement);
@@ -106,6 +118,8 @@ const failed_list = get_element('failed-list', HTMLDivElement);
 const modal_main_button = get_element('modal-main', HTMLButtonElement);
 
 const all_pairs = make_all_pairs(letters);
+let word_map: WordMap = {};
+let incorrect_feedback_timeout: number | undefined;
 
 const state: State = {
     screen: 'menu',
@@ -124,6 +138,119 @@ function fresh_stats(): PracticeStats {
         incorrect: 0,
         failures: {},
     };
+}
+
+function set_word_dependent_buttons_enabled(enabled: boolean): void {
+    all_words_button.disabled = !enabled;
+    specific_letters_button.disabled = !enabled;
+    specific_pairs_button.disabled = !enabled;
+    view_loaded_pairs_button.disabled = !enabled;
+}
+
+function set_word_file_status(message: string, status: 'default' | 'loaded' | 'error'): void {
+    word_file_status.textContent = message;
+    word_file_status.classList.toggle('loaded', status === 'loaded');
+    word_file_status.classList.toggle('error', status === 'error');
+}
+
+function clear_word_data(): void {
+    word_map = {};
+    state.selected_letters.clear();
+    state.selected_pairs.clear();
+    set_word_dependent_buttons_enabled(false);
+}
+
+function use_parsed_word_data(parsed_data: ParsedWordData, source: string): void {
+    const word_count = Object.keys(parsed_data.word_map).length;
+
+    if (word_count === 0) {
+        clear_word_data();
+        set_word_file_status(`No valid letter pairs were found in ${source}.`, 'error');
+        return;
+    }
+
+    word_map = parsed_data.word_map;
+    state.selected_letters.clear();
+    state.selected_pairs.clear();
+    set_word_dependent_buttons_enabled(true);
+
+    const warning_suffix = parsed_data.warning_count === 0
+        ? ''
+        : ` (${parsed_data.warning_count} warning${parsed_data.warning_count === 1 ? '' : 's'}; see console)`;
+    set_word_file_status(`${word_count} letter pairs loaded${warning_suffix}.`, 'loaded');
+}
+
+function report_word_load_error(error: unknown): void {
+    clear_word_data();
+    console.error('Unable to parse 3BLD word JSON:', error);
+    set_word_file_status('Parsing JSON Failed', 'error');
+}
+
+async function load_word_file(): Promise<void> {
+    const file = word_file_input.files?.[0];
+
+    if (file === undefined) {
+        clear_word_data();
+        set_word_file_status('Upload a word list to begin.', 'default');
+        return;
+    }
+
+    try {
+        use_parsed_word_data(parse_word_json(await file.text()), 'this file');
+    } catch (error: unknown) {
+        report_word_load_error(error);
+    }
+}
+
+function load_example_word_file(): void {
+    const data = [{ pair: 'NA', answer: 'Salt' }, { pair: 'TS', answer: 'Test' }, { pair: 'FB', answer: 'FooBar' }];
+    clear_word_data();
+    use_parsed_word_data(json_to_word_map(data), 'example data');
+}
+
+function pair_is_available(pair: string): boolean {
+    return Object.prototype.hasOwnProperty.call(word_map, pair);
+}
+
+function available_row_pairs(first: string): string[] {
+    return letters.map((second) => first + second).filter(pair_is_available);
+}
+
+function available_column_pairs(second: string): string[] {
+    return letters.map((first) => first + second).filter(pair_is_available);
+}
+
+function clear_incorrect_feedback(): void {
+    if (incorrect_feedback_timeout !== undefined) {
+        window.clearTimeout(incorrect_feedback_timeout);
+        incorrect_feedback_timeout = undefined;
+    }
+
+    incorrect_feedback.textContent = '';
+    incorrect_feedback.classList.remove('visible', 'fade-out');
+    incorrect_feedback.setAttribute('aria-hidden', 'true');
+}
+
+function show_incorrect_feedback(pair: string, answer: string): void {
+    if (incorrect_feedback_timeout !== undefined) {
+        window.clearTimeout(incorrect_feedback_timeout);
+    }
+
+    incorrect_feedback.textContent = `Incorrect: "${display_pair(pair)}" is "${answer}".`;
+    incorrect_feedback.classList.remove('fade-out');
+    incorrect_feedback.classList.add('visible');
+    incorrect_feedback.setAttribute('aria-hidden', 'false');
+
+    window.requestAnimationFrame(() => {
+        incorrect_feedback.classList.add('fade-out');
+    });
+
+    incorrect_feedback_timeout = window.setTimeout(() => {
+        incorrect_feedback.textContent = '';
+        incorrect_feedback.classList.remove('visible', 'fade-out');
+        incorrect_feedback.setAttribute('aria-hidden', 'true');
+        incorrect_feedback_timeout = undefined;
+    }, 5000);
 }
 
 function create_letter_selector(): void {
@@ -195,6 +322,7 @@ function set_screen(screen: Screen): void {
     menu_screen.hidden = screen !== 'menu';
     letter_screen.hidden = screen !== 'letter-select';
     pair_screen.hidden = screen !== 'pair-select';
+    loaded_pairs_screen.hidden = screen !== 'loaded-pairs';
     practice_screen.hidden = screen !== 'practice';
 
     back_main_button.hidden = screen === 'menu';
@@ -212,9 +340,13 @@ function set_screen(screen: Screen): void {
 
     if (screen === 'letter-select') update_letter_selector();
     if (screen === 'pair-select') update_pair_selector();
+    if (screen === 'loaded-pairs') update_loaded_pairs_view();
 }
 
 function update_practice_controls(): void {
+    const loaded_count = Object.keys(word_map).length;
+    pairs_loaded_count.textContent = `${loaded_count} pair${loaded_count === 1 ? '' : 's'} loaded`;
+
     if (state.mode === 'letters') {
         change_constraint_button.hidden = false;
         change_constraint_button.textContent = 'Change Letter';
@@ -236,7 +368,12 @@ function update_letter_selector(): void {
     buttons.forEach((button) => {
         const letter = button.dataset.letter;
         if (letter === undefined) return;
-        const selected = state.selected_letters.has(letter);
+
+        const available = available_row_pairs(letter).length > 0;
+        if (!available) state.selected_letters.delete(letter);
+
+        const selected = available && state.selected_letters.has(letter);
+        button.disabled = !available;
         button.classList.toggle('selected', selected);
         button.setAttribute('aria-pressed', selected.toString());
     });
@@ -245,11 +382,13 @@ function update_letter_selector(): void {
 }
 
 function row_is_selected(letter: string): boolean {
-    return letters.every((second) => state.selected_pairs.has(letter + second));
+    const pairs = available_row_pairs(letter);
+    return pairs.length > 0 && pairs.every((pair) => state.selected_pairs.has(pair));
 }
 
 function column_is_selected(letter: string): boolean {
-    return letters.every((first) => state.selected_pairs.has(first + letter));
+    const pairs = available_column_pairs(letter);
+    return pairs.length > 0 && pairs.every((pair) => state.selected_pairs.has(pair));
 }
 
 function update_pair_selector(): void {
@@ -257,7 +396,12 @@ function update_pair_selector(): void {
     pair_buttons.forEach((button) => {
         const pair = button.dataset.pair;
         if (pair === undefined) return;
-        const selected = state.selected_pairs.has(pair);
+
+        const available = pair_is_available(pair);
+        if (!available) state.selected_pairs.delete(pair);
+
+        const selected = available && state.selected_pairs.has(pair);
+        button.disabled = !available;
         button.classList.toggle('selected', selected);
         button.setAttribute('aria-pressed', selected.toString());
     });
@@ -266,7 +410,10 @@ function update_pair_selector(): void {
     row_buttons.forEach((button) => {
         const row = button.dataset.row;
         if (row === undefined) return;
-        const selected = row_is_selected(row);
+
+        const available = available_row_pairs(row).length > 0;
+        const selected = available && row_is_selected(row);
+        button.disabled = !available;
         button.classList.toggle('selected', selected);
         button.setAttribute('aria-pressed', selected.toString());
     });
@@ -275,12 +422,40 @@ function update_pair_selector(): void {
     column_buttons.forEach((button) => {
         const column = button.dataset.column;
         if (column === undefined) return;
-        const selected = column_is_selected(column);
+
+        const available = available_column_pairs(column).length > 0;
+        const selected = available && column_is_selected(column);
+        button.disabled = !available;
         button.classList.toggle('selected', selected);
         button.setAttribute('aria-pressed', selected.toString());
     });
 
     continue_pairs_button.disabled = state.selected_pairs.size === 0;
+}
+
+function update_loaded_pairs_view(): void {
+    loaded_pairs_list.replaceChildren();
+
+    const pairs = Object.keys(word_map).sort();
+    loaded_pairs_empty.hidden = pairs.length > 0;
+
+    for (const pair of pairs) {
+        const answer = word_map[pair];
+        if (answer === undefined) continue;
+
+        const row = document.createElement('div');
+        row.className = 'loaded-pair-item';
+
+        const pair_element = document.createElement('strong');
+        pair_element.className = 'loaded-pair-code';
+        pair_element.textContent = pair;
+
+        const answer_element = document.createElement('span');
+        answer_element.textContent = answer;
+
+        row.append(pair_element, answer_element);
+        loaded_pairs_list.append(row);
+    }
 }
 
 function get_correct_percentage(): string {
@@ -321,7 +496,7 @@ function update_practice_view(): void {
     const no_words = state.practice_pairs.length === 0;
 
     no_words_div.hidden = !no_words;
-    pair_display.hidden = no_words;
+    pair_box.hidden = no_words;
     answer_form.hidden = no_words;
 
     if (!no_words && state.current_pair !== undefined) {
@@ -340,6 +515,7 @@ function go_main_menu(): void {
     state.warning = undefined;
     state.finish_open = false;
     state.reconfiguring = false;
+    clear_incorrect_feedback();
     finish_modal.hidden = true;
     set_screen('menu');
 }
@@ -359,6 +535,7 @@ function setup_practice(mode: PracticeMode): void {
     if (!state.reconfiguring) state.stats = fresh_stats();
     state.warning = undefined;
     state.finish_open = false;
+    clear_incorrect_feedback();
     state.current_pair = choose_random(state.practice_pairs);
     state.reconfiguring = false;
     finish_modal.hidden = true;
@@ -386,6 +563,7 @@ function submit_guess(guess: string): void {
     } else {
         state.stats.incorrect += 1;
         state.stats.failures = update_failure_count(state.stats.failures, current_pair, 1);
+        show_incorrect_feedback(current_pair, answer);
     }
 
     state.stats.last_result = {
@@ -421,23 +599,30 @@ function mark_previous_incorrect(): void {
     state.stats.failures = update_failure_count(state.stats.failures, last_result.pair, 1);
     last_result.retroactively_marked_incorrect = true;
     state.warning = undefined;
+    show_incorrect_feedback(last_result.pair, last_result.answer);
     update_practice_view();
 }
 
 function toggle_letter(letter: string): void {
+    if (available_row_pairs(letter).length === 0) return;
+
     if (state.selected_letters.has(letter)) state.selected_letters.delete(letter);
     else state.selected_letters.add(letter);
     update_letter_selector();
 }
 
 function toggle_pair(pair: string): void {
+    if (!pair_is_available(pair)) return;
+
     if (state.selected_pairs.has(pair)) state.selected_pairs.delete(pair);
     else state.selected_pairs.add(pair);
     update_pair_selector();
 }
 
 function toggle_row(first: string): void {
-    const pairs = letters.map((second) => first + second);
+    const pairs = available_row_pairs(first);
+    if (pairs.length === 0) return;
+
     const all_selected = pairs.every((pair) => state.selected_pairs.has(pair));
 
     for (const pair of pairs) {
@@ -449,7 +634,9 @@ function toggle_row(first: string): void {
 }
 
 function toggle_column(second: string): void {
-    const pairs = letters.map((first) => first + second);
+    const pairs = available_column_pairs(second);
+    if (pairs.length === 0) return;
+
     const all_selected = pairs.every((pair) => state.selected_pairs.has(pair));
 
     for (const pair of pairs) {
@@ -532,6 +719,13 @@ function handle_pair_grid_click(event: MouseEvent): void {
 create_letter_selector();
 create_pair_selector();
 
+word_file_input.addEventListener('change', () => {
+    void load_word_file();
+});
+example_word_file_button.addEventListener('click', () => {
+    load_example_word_file();
+});
+
 all_words_button.addEventListener('click', () => setup_practice('all'));
 specific_letters_button.addEventListener('click', () => {
     state.mode = 'letters';
@@ -541,6 +735,7 @@ specific_pairs_button.addEventListener('click', () => {
     state.mode = 'pairs';
     set_screen('pair-select');
 });
+view_loaded_pairs_button.addEventListener('click', () => set_screen('loaded-pairs'));
 
 back_main_button.addEventListener('click', go_main_menu);
 modal_main_button.addEventListener('click', go_main_menu);

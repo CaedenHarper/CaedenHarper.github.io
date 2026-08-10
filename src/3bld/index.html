@@ -16,6 +16,7 @@
                 </div>
                 <h1 id="page-title">3BLD Letter Pair Practice</h1>
                 <div id="practice-controls" class="topbar-side right-controls" hidden>
+                    <span id="pairs-loaded-count" class="pairs-loaded-count"></span>
                     <button type="button" id="change-constraint" class="secondary-button" hidden></button>
                     <button type="button" id="finish-button">Finish</button>
                 </div>
@@ -25,9 +26,18 @@
                 <section id="menu-screen" class="screen menu-card">
                     <h2>Choose Practice Mode</h2>
                     <div class="menu-buttons">
-                        <button type="button" id="all-words-button">All Words</button>
-                        <button type="button" id="specific-letters-button">Specific Starting Letter</button>
-                        <button type="button" id="specific-pairs-button">Specific Pairs</button>
+                        <button type="button" id="all-words-button" disabled>All Words</button>
+                        <button type="button" id="specific-letters-button" disabled>Specific Starting Letter</button>
+                        <button type="button" id="specific-pairs-button" disabled>Specific Pairs</button>
+                        <button type="button" id="view-loaded-pairs-button" class="secondary-button" disabled>View Loaded Pairs</button>
+                    </div>
+                    <div class="word-file-controls">
+                        <div class="word-file-input-row">
+                            <label for="word-file-input">Input a JSON file:</label>
+                            <input type="file" id="word-file-input" accept=".json,application/json">
+                            <button type="button" id="example-word-file" class="secondary-button">Example</button>
+                        </div>
+                        <p id="word-file-status" class="word-file-status">Upload a word list to begin.</p>
                     </div>
                 </section>
 
@@ -51,8 +61,19 @@
                     </div>
                 </section>
 
+
+                <section id="loaded-pairs-screen" class="screen selector-card" hidden>
+                    <h2>Loaded Pairs</h2>
+                    <div id="loaded-pairs-empty" class="no-words loaded-pairs-empty" hidden>No Words Available!</div>
+                    <div id="loaded-pairs-list" class="loaded-pairs-list"></div>
+                </section>
+
                 <section id="practice-screen" class="screen practice-card" hidden>
-                    <div id="pair-display" class="pair-display"></div>
+                    <div id="incorrect-feedback" class="incorrect-feedback" role="status" aria-live="polite" aria-hidden="true"></div>
+                    <div id="pair-box" class="pair-box">
+                        <div id="pair-display" class="pair-display"></div>
+                    </div>
+
                     <div id="no-words" class="no-words" hidden>No Words Available!</div>
 
                     <form id="answer-form" class="answer-row">
@@ -68,11 +89,6 @@
                         <button type="submit">Answer</button>
                     </form>
 
-                    <div id="warning-row" class="warning-row" hidden>
-                        <span id="warning-text"></span>
-                        <button type="button" id="mark-incorrect" class="secondary-button">Mark as Incorrect</button>
-                    </div>
-
                     <div class="stats">
                         <div class="stat-line"><span>Total Guesses</span><strong id="total-guesses">0</strong></div>
                         <div class="stat-line"><span>Total Correct</span><strong id="total-correct">0</strong></div>
@@ -82,6 +98,11 @@
                             <span>Needs Work</span>
                             <strong id="needs-work"></strong>
                         </div>
+                    </div>
+
+                    <div id="warning-row" class="warning-row" hidden>
+                        <span id="warning-text"></span>
+                        <button type="button" id="mark-incorrect" class="secondary-button">Mark as Incorrect</button>
                     </div>
                 </section>
             </main>
