@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang=en><link rel=stylesheet href=/CaedenHarper.github.io.b611583e.css><meta name=viewport content="width=device-width, initial-scale=1"><title>3BLD Letter Pair Practice</title><link rel=stylesheet href=/3bld.78548cb7.css><body>
+        <div id=main_div>
+            <header id=topbar>
+                <div class=topbar-side>
+                    <button type=button id=back-main class=secondary-button hidden>
+                        Back to Main Menu
+                    </button>
+                </div>
+                <h1 id=page-title>3BLD Letter Pair Practice</h1>
+                <div id=practice-controls class="right-controls topbar-side" hidden>
+                    <span id=pairs-loaded-count class=pairs-loaded-count></span>
+                    <button type=button id=change-constraint class=secondary-button hidden></button>
+                    <button type=button id=finish-button>Finish</button>
+                </div>
+            </header>
+
+            <main id=content>
+                <section id=menu-screen class="menu-card screen">
+                    <h2>Choose Practice Mode</h2>
+                    <div class=menu-buttons>
+                        <button type=button id=all-words-button disabled>All Words</button>
+                        <button type=button id=specific-letters-button disabled>Specific Starting Letter</button>
+                        <button type=button id=specific-pairs-button disabled>Specific Pairs</button>
+                        <button type=button id=view-loaded-pairs-button class=secondary-button disabled>View Loaded Pairs</button>
+                    </div>
+                    <div class=word-file-controls>
+                        <div class=word-file-input-row>
+                            <label for=word-file-input>Input a JSON file:</label>
+                            <input type=file id=word-file-input accept=.json,application/json>
+                            <button type=button id=example-word-file class=secondary-button>Example</button>
+                        </div>
+                        <p id=word-file-status class=word-file-status>Upload a word list to begin.</p>
+                    </div>
+                </section>
+
+                <section id=letter-screen class="screen selector-card" hidden>
+                    <h2>Starting Letters</h2>
+                    <p>Choose one or more starting letters.</p>
+                    <div id=letter-grid class=letter-grid></div>
+                    <div class=selector-footer>
+                        <button type=button id=continue-letters disabled>Continue</button>
+                    </div>
+                </section>
+
+                <section id=pair-screen class="screen selector-card" hidden>
+                    <h2>Specific Pairs</h2>
+                    <p>Choose pairs directly, or use a row/column header to toggle that whole axis.</p>
+                    <div class=pair-grid-wrap>
+                        <div id=pair-grid class=pair-grid></div>
+                    </div>
+                    <div class=selector-footer>
+                        <button type=button id=continue-pairs disabled>Continue</button>
+                    </div>
+                </section>
+
+
+                <section id=loaded-pairs-screen class="screen selector-card" hidden>
+                    <h2>Loaded Pairs</h2>
+                    <div id=loaded-pairs-empty class="loaded-pairs-empty no-words" hidden>No Words Available!</div>
+                    <div id=loaded-pairs-list class=loaded-pairs-list></div>
+                </section>
+
+                <section id=practice-screen class="practice-card screen" hidden>
+                    <div id=incorrect-feedback class=incorrect-feedback role=status aria-live=polite aria-hidden=true></div>
+                    <div id=pair-box class=pair-box>
+                        <div id=pair-display class=pair-display></div>
+                    </div>
+
+                    <div id=no-words class=no-words hidden>No Words Available!</div>
+
+                    <form id=answer-form class=answer-row>
+                        <label for=answer-input class=visually-hidden>Answer</label>
+                        <input id=answer-input autocomplete=off autocapitalize=off spellcheck=false placeholder=Word...>
+                        <button>Answer</button>
+                    </form>
+
+                    <div class=stats>
+                        <div class=stat-line><span>Total Guesses</span><strong id=total-guesses>0</strong></div>
+                        <div class=stat-line><span>Total Correct</span><strong id=total-correct>0</strong></div>
+                        <div class=stat-line><span>Total Incorrect</span><strong id=total-incorrect>0</strong></div>
+                        <div class=stat-line><span>Correct Percentage</span><strong id=correct-percentage>0.00%</strong></div>
+                        <div id=needs-work-row class=stat-line hidden>
+                            <span>Needs Work</span>
+                            <strong id=needs-work></strong>
+                        </div>
+                    </div>
+
+                    <div id=warning-row class=warning-row hidden>
+                        <span id=warning-text></span>
+                        <button type=button id=mark-incorrect class=secondary-button>Mark as Incorrect</button>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <div id=finish-modal class=modal-backdrop hidden>
+            <section class=modal role=dialog aria-modal=true aria-labelledby=finish-title>
+                <h2 id=finish-title>Session Results</h2>
+                <div class=stats>
+                    <div class=stat-line><span>Total Guesses</span><strong id=finish-total-guesses>0</strong></div>
+                    <div class=stat-line><span>Total Correct</span><strong id=finish-total-correct>0</strong></div>
+                    <div class=stat-line><span>Total Incorrect</span><strong id=finish-total-incorrect>0</strong></div>
+                    <div class=stat-line><span>Correct Percentage</span><strong id=finish-correct-percentage>0.00%</strong></div>
+                </div>
+                <div class=failed-list>
+                    <h3>Needs Work</h3>
+                    <div id=failed-list></div>
+                </div>
+                <button type=button id=modal-main class=secondary-button>Back to Main Menu</button>
+            </section>
+        </div>
+
+        <script type=module src=/3bld.cb8b3e8a.js></script>
+    
+
