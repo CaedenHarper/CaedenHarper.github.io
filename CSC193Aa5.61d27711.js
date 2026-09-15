@@ -1,0 +1,2 @@
+function makeTextBigger(){document.getElementById("main-text").style.fontSize="24pt"}function mooText(){let t=document.getElementById("main-text"),e=t.value.toUpperCase(),n="";for(let t of e.split("."))0!=t.trim().length&&(n+=t+"-Moo.");t.value=n}function fancy(){let t=document.getElementById("main-text");t.style.fontWeight="bold",t.style.color="blue",t.style.textDecoration="underline"}function boring(){let t=document.getElementById("main-text");t.style.fontWeight="normal",t.style.color="black",t.style.textDecoration="none"}
+//# sourceMappingURL=CSC193Aa5.61d27711.js.map
